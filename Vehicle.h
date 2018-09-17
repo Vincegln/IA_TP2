@@ -58,6 +58,7 @@ private:
 
 public:
 
+
   Vehicle(GameWorld* world,
          Vector2D position,
          double    rotation,
