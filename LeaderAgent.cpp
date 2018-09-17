@@ -11,3 +11,8 @@ LeaderAgent::LeaderAgent(GameWorld * world, Vector2D position, double rotation, 
 	scale)
 {
 }
+
+LeaderAgent::~LeaderAgent()
+{
+	Vehicle::~Vehicle();
+}

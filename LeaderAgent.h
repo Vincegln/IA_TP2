@@ -15,6 +15,8 @@ public:
 		double    max_speed,
 		double    max_turn_rate,
 		double    scale);
+
+	~LeaderAgent();
 	
 };
 

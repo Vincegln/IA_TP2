@@ -1,4 +1,5 @@
 #include "FollowAgent.h"
+#include "SteeringBehaviors.h"
 
 FollowAgent::FollowAgent(GameWorld* world,
 	Vector2D position,
@@ -18,10 +19,17 @@ FollowAgent::FollowAgent(GameWorld* world,
 		max_force,
 		max_speed,
 		max_turn_rate,
-		scale){
+		scale)
+{
+	separation = false;
+	alignment = false;
+	cohesion = false;
+	pursuit = false;
 }
 
 FollowAgent::~FollowAgent()
 {
 	Vehicle::~Vehicle();
 }
+
+
