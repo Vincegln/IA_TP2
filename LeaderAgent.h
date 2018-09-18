@@ -2,8 +2,14 @@
 
 #include "Vehicle.h"
 
+class GameWorld;
+class SteeringBehavior;
+
 class LeaderAgent : Vehicle
 {
+
+private:
+	bool moving;
 public:
 
 	LeaderAgent(GameWorld* world,
@@ -17,6 +23,11 @@ public:
 		double    scale);
 
 	~LeaderAgent();
+
+	//-------------------------------------------accessor methods
+
+	void OnMoving() { this->Steering()->WanderOn(); moving = true; };
+	void OffMoving() { this->Steering()->WanderOff(); moving = false; };
 
 
 	
