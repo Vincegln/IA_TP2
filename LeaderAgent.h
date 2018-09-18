@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Vehicle.h"
+#include "SteeringBehaviors.h"
+#include "GameWorld.h"
 
 class GameWorld;
 class SteeringBehavior;

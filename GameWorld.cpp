@@ -1,5 +1,6 @@
 #include "GameWorld.h"
 #include "Vehicle.h"
+#include "FollowAgent.h"
 #include "constants.h"
 #include "Obstacle.h"
 #include "2d/Geometry.h"
@@ -57,7 +58,17 @@ GameWorld::GameWorld(int cx, int cy):
                                  cy/2.0+RandomClamped()*cy/2.0);
 
 
-    Vehicle* pVehicle = new Vehicle(this,
+    //Vehicle* pVehicle = new Vehicle(this,
+    //                                SpawnPos,                 //initial position
+    //                                RandFloat()*TwoPi,        //start rotation
+    //                                Vector2D(0,0),            //velocity
+    //                                Prm.VehicleMass,          //mass
+    //                                Prm.MaxSteeringForce,     //max force
+    //                                Prm.MaxSpeed,             //max velocity
+    //                                Prm.MaxTurnRatePerSecond, //max turn rate
+    //                                Prm.VehicleScale);        //scale
+	
+	Vehicle* pVehicle = new FollowAgent(this,
                                     SpawnPos,                 //initial position
                                     RandFloat()*TwoPi,        //start rotation
                                     Vector2D(0,0),            //velocity
@@ -67,7 +78,9 @@ GameWorld::GameWorld(int cx, int cy):
                                     Prm.MaxTurnRatePerSecond, //max turn rate
                                     Prm.VehicleScale);        //scale
 
-    pVehicle->Steering()->FlockingOn();
+	dynamic_cast<FollowAgent*>(pVehicle)->FlockingOn();
+	dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit();
+
 
     m_Vehicles.push_back(pVehicle);
 

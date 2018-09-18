@@ -10,7 +10,8 @@
 #include "misc/CellSpacePartition.h"
 #include "BaseGameEntity.h"
 #include "EntityFunctionTemplates.h"
-#include "vehicle.h"
+#include "Vehicle.h"
+#include "FollowAgent.h"
 
 
 class Obstacle;

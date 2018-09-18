@@ -21,9 +21,7 @@ FollowAgent::FollowAgent(GameWorld* world,
 		max_turn_rate,
 		scale)
 {
-	separation = false;
-	alignment = false;
-	cohesion = false;
+	flocking = false;
 	pursuit = false;
 }
 

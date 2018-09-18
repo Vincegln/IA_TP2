@@ -1,5 +1,7 @@
 #pragma once
 #include "Vehicle.h"
+#include "SteeringBehaviors.h"
+#include "GameWorld.h"
 
 class GameWorld;
 class SteeringBehavior;
@@ -8,9 +10,7 @@ class FollowAgent : public Vehicle
 {
 
 private:
-	bool separation;
-	bool alignment;
-	bool cohesion;
+	bool flocking;
 	bool pursuit;
 
 public:
@@ -29,15 +29,8 @@ public:
 
 
 	//-------------------------------------------accessor methods
-
-	void OnSeperation() { this->Steering()->SeparationOn(); separation = true; };
-	void OffSeperation() { this->Steering()->SeparationOff(); separation = false; };
-	
-	void OnAlignment() { this->Steering()->AlignmentOn(); alignment = true; };
-	void OffAlignment() { this->Steering()->AlignmentOff(); alignment = false; };
-
-	void OnCohesion() { this->Steering()->CohesionOn(); cohesion = true; };
-	void OffCohesion() { this->Steering()->CohesionOff(); cohesion = false; };
+	void FlockingOn() { this->Steering()->FlockingOn(); flocking = true; }
+	void FlockingOff() { this->Steering()->FlockingOff(); flocking = false; };
 
 	void OnPursuit() { this->Steering()->OffsetPursuitOn(this, Vector2D(1, 0)); pursuit = true; };
 	void OffPursuit() { this->Steering()->OffsetPursuitOff(); pursuit = false; };
