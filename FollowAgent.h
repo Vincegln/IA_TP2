@@ -27,6 +27,9 @@ public:
 
 	~FollowAgent();
 
+
+	//-------------------------------------------accessor methods
+
 	void OnSeperation() { this->Steering()->SeparationOn(); separation = true; };
 	void OffSeperation() { this->Steering()->SeparationOff(); separation = false; };
 	
@@ -35,6 +38,9 @@ public:
 
 	void OnCohesion() { this->Steering()->CohesionOn(); cohesion = true; };
 	void OffCohesion() { this->Steering()->CohesionOff(); cohesion = false; };
+
+	void OnPursuit() { this->Steering()->OffsetPursuitOn(this, Vector2D(1, 0)); pursuit = true; };
+	void OffPursuit() { this->Steering()->OffsetPursuitOff(); pursuit = false; };
 
 
 };

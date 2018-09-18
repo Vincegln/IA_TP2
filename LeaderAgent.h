@@ -17,6 +17,8 @@ public:
 		double    scale);
 
 	~LeaderAgent();
+
+
 	
 };
 
