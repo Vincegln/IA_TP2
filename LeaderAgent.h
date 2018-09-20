@@ -7,7 +7,7 @@
 class GameWorld;
 class SteeringBehavior;
 
-class LeaderAgent : Vehicle
+class LeaderAgent : public Vehicle
 {
 
 private:
