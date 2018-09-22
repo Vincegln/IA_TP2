@@ -135,6 +135,7 @@
   <ItemGroup>
     <ClCompile Include="2D\Vector2d.cpp" />
     <ClCompile Include="FollowAgent.cpp" />
+    <ClCompile Include="HumanLeader.cpp" />
     <ClCompile Include="LeaderAgent.cpp" />
     <ClCompile Include="misc\Cgdi.cpp" />
     <ClCompile Include="misc\iniFileLoaderBase.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="2D\Transformations.h" />
     <ClInclude Include="2D\Vector2D.h" />
     <ClInclude Include="2D\Wall2D.h" />
+    <ClInclude Include="HumanLeader.h" />
     <ClInclude Include="LeaderAgent.h" />
     <ClInclude Include="misc\CellSpacePartition.h" />
     <ClInclude Include="misc\Cgdi.h" />

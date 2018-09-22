@@ -89,7 +89,7 @@ GameWorld::GameWorld(int cx, int cy):
 			  Prm.MaxTurnRatePerSecond, //max turn rate
 			  Prm.VehicleScale);        //scale
 
-		  //dynamic_cast<FollowAgent*>(pVehicle)->FlockingOn();
+		  dynamic_cast<FollowAgent*>(pVehicle)->FlockingOn();
 		  dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit(pVehicleTemp);
 
 		  pVehicleTemp = pVehicle;
