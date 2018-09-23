@@ -70,6 +70,20 @@ GameWorld::GameWorld(int cx, int cy):
 
   Vehicle* pVehicleTemp = pLeader;
 
+  // Creation of the second LeaderAgent
+  Vehicle* pSecondLeader = new LeaderAgent(this,
+	  SpawnPos,                 //initial position
+	  RandFloat()*TwoPi,        //start rotation
+	  Vector2D(0, 0),            //velocity
+	  Prm.VehicleMass,          //mass
+	  Prm.MaxSteeringForce,     //max force
+	  Prm.MaxSpeed,             //max velocity
+	  Prm.MaxTurnRatePerSecond, //max turn rate
+	  Prm.VehicleScale);        //scale
+
+  dynamic_cast<LeaderAgent*>(pSecondLeader)->OnMoving();
+  m_Vehicles.push_back(pSecondLeader);
+
 
   //setup the agents
   for (int a=0; a<Prm.NumAgents; ++a)
@@ -91,6 +105,7 @@ GameWorld::GameWorld(int cx, int cy):
 
 		  dynamic_cast<FollowAgent*>(pVehicle)->FlockingOn();
 		  dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit(pVehicleTemp);
+		  dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit(pSecondLeader);
 
 		  pVehicleTemp = pVehicle;
 
@@ -186,7 +201,24 @@ void GameWorld::Update(double time_elapsed)
   //update the vehicles
   for (unsigned int a=0; a<m_Vehicles.size(); ++a)
   {
-    m_Vehicles[a]->Update(time_elapsed);
+	if (a == 2 && typeid(*m_Vehicles[1]).name() == "LeaderAgent") {
+		Vector2D followAgentPos = m_Vehicles[a]->Pos();
+		Vector2D leader1Pos = m_Vehicles[0]->Pos();
+		Vector2D leader2Pos = m_Vehicles[1]->Pos();
+		float dist1 = followAgentPos.Distance(leader1Pos);
+		float dist2 = followAgentPos.Distance(leader2Pos);
+		if (dist1 < dist2)
+		{
+			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OffPursuit();
+			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OnPursuit(m_Vehicles[0]);
+		}
+		else
+		{
+			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OffPursuit();
+			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OnPursuit(m_Vehicles[1]);
+		}
+	}
+	m_Vehicles[a]->Update(time_elapsed);
   }
 }
   
