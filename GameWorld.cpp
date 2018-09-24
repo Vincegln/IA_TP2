@@ -41,7 +41,8 @@ GameWorld::GameWorld(int cx, int cy):
             m_pPath(NULL),
             m_bRenderNeighbors(false),
             m_bViewKeys(false),
-            m_bShowCellSpaceInfo(false)
+            m_bShowCellSpaceInfo(false),
+			m_bHumanLeader(false)
 {
 
   //setup the spatial subdivision class
@@ -361,6 +362,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
           }
         }
         break;
+
 
   }//end switch
 }

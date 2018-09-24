@@ -53,6 +53,12 @@ BEGIN
     BEGIN
         MENUITEM "On/Off",                      ID_MENU_SMOOTHING
     END
+	POPUP "IA TP2"
+	BEGIN
+		MENUITEM "1 Leader",					IDA_ONE_LEADER
+		MENUITEM "2 Leader",					IDA_TWO_LEADER
+		MENUITEM "HumanLeader",					IDA_HUMAN_LEADER
+	END
 END
 
 

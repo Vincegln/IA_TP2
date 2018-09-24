@@ -18,13 +18,16 @@
 #define ID_VIEW_FPS                     40013
 #define ID_MENU_SMOOTHING               40014
 #define IDM_PARTITION_VIEW_NEIGHBORS    40015
+#define IDA_ONE_LEADER					40016
+#define IDA_TWO_LEADER					40017
+#define IDA_HUMAN_LEADER				40018
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        102
-#define _APS_NEXT_COMMAND_VALUE         40016
+#define _APS_NEXT_COMMAND_VALUE         40019
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -16,7 +16,7 @@
 //
 //------------------------------------------------------------------------
 
-char* g_szApplicationName = "Steering Behaviors - Another Big Shoal";
+char* g_szApplicationName = "IA TP 2 LeaderAgent and HumanLeader";
 char*	g_szWindowClassName = "MyWindowClass";
 
 GameWorld* g_GameWorld;
