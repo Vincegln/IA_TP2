@@ -68,6 +68,13 @@ private:
   bool  m_bHumanLeader;
   bool  m_bOneLeader;
   bool  m_bTwoLeader;
+  bool  m_bTwentyAgent;
+  bool  m_bFiftyAgent;
+  bool  m_bHundredAgent;
+  bool  m_bTwoOffset;
+  bool  m_bFiveOffset;
+  bool  m_bTenOffset;
+  
 
   void CreateObstacles();
 
@@ -125,9 +132,18 @@ public:
   bool  RenderWanderCircle()const{return m_bShowWanderCircle;}
   bool  RenderFeelers()const{return m_bShowFeelers;}
   bool  RenderSteeringForce()const{return m_bShowSteeringForce;}
+
   bool  RenderHumanLeader()const { return m_bHumanLeader; }
   bool  RenderOneLeader()const { return m_bOneLeader; }
   bool  RenderTwoLeader()const { return m_bTwoLeader; }
+
+  bool RenderTwentyAgent() const { return m_bTwentyAgent; }
+  bool RenderFiftyAgent() const { return m_bFiftyAgent; }
+  bool RenderHundredAgent() const { return m_bHundredAgent; }
+
+  bool RenderTwoOffset() const { return m_bTwoOffset; }
+  bool RenderFiveOffset() const { return m_bFiveOffset; }
+  bool RenderTenOffset() const { return m_bTenOffset; }
 
   bool  RenderFPS()const{return m_bShowFPS;}
   void  ToggleShowFPS(){m_bShowFPS = !m_bShowFPS;}
