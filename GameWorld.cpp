@@ -593,6 +593,32 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
         CheckMenuItemAppropriately(hwnd, ID_MENU_SMOOTHING, m_Vehicles[0]->isSmoothingOn());
       }
 
+	  break;
+
+	  case IDA_ONE_LEADER:
+	  {
+		  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_UNCHECKED);  
+	  }
+
+	  break;
+
+	  case IDA_TWO_LEADER:
+	  {
+		  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_UNCHECKED);
+	  }
+
+	  break;
+
+	  case IDA_HUMAN_LEADER:
+	  {
+		  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_CHECKED);
+	  }
       break;
       
   }//end switch

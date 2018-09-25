@@ -83,8 +83,10 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
          
          g_GameWorld = new GameWorld(cxClient, cyClient);
 
+		 // Check the items that are already set up 
          ChangeMenuState(hwnd, IDR_PRIORITIZED, MFS_CHECKED);
          ChangeMenuState(hwnd, ID_VIEW_FPS, MFS_CHECKED);
+		 ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_CHECKED);
          
       }
 
