@@ -125,7 +125,7 @@ void Vehicle::Render()
   //render vehicles in different colors
   if (m_pWorld->RenderHumanLeader())
   {
-	  if (ID() == 0) gdi->GreenPen();
+	  if (ID() == 2) gdi->GreenPen();
 	  else gdi->BluePen();
   }
   else if (m_pWorld->RenderTwoLeader()) 

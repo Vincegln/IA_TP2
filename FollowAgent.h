@@ -32,7 +32,7 @@ public:
 	void FlockingOn() { this->Steering()->FlockingOn(); flocking = true; }
 	void FlockingOff() { this->Steering()->FlockingOff(); flocking = false; };
 
-	void OnPursuit(Vehicle* vehicle) { this->Steering()->OffsetPursuitOn(vehicle, Vector2D(5, 5)); pursuit = true; };
+	void OnPursuit(Vehicle* vehicle, Vector2D offset) { this->Steering()->OffsetPursuitOn(vehicle, offset); pursuit = true; };
 	void OffPursuit() { this->Steering()->OffsetPursuitOff(); pursuit = false; };
 
 

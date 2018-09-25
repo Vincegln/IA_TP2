@@ -2,6 +2,7 @@
 #include "Vehicle.h"
 #include "FollowAgent.h"
 #include "LeaderAgent.h"
+#include "HumanLeader.h"
 #include "constants.h"
 #include "Obstacle.h"
 #include "2d/Geometry.h"
@@ -21,6 +22,10 @@
 using std::list;
 
 // Creation of the two LeaderAgent and HumanAgent
+Vehicle* pLeader_temp;
+Vehicle* pSecondLeader_temp;
+Vehicle* pHumanLeader_temp;
+
 
 
 
@@ -47,7 +52,13 @@ GameWorld::GameWorld(int cx, int cy):
             m_bShowCellSpaceInfo(false),
 			m_bHumanLeader(false),
 			m_bOneLeader(true),
-			m_bTwoLeader(false)
+			m_bTwoLeader(false),
+			m_bTwoOffset(false),
+			m_bFiveOffset(true),
+			m_bTenOffset(false),
+			m_bTwentyAgent(true),
+			m_bFiftyAgent(false),
+			m_bHundredAgent(false)
 {
 
   //setup the spatial subdivision class
@@ -71,8 +82,40 @@ GameWorld::GameWorld(int cx, int cy):
 	  Prm.MaxTurnRatePerSecond, //max turn rate
 	  Prm.VehicleScale);        //scale
 
+  pLeader_temp = pLeader;
+
   dynamic_cast<LeaderAgent*>(pLeader)->OnMoving();
   m_Vehicles.push_back(pLeader);
+
+  // Creation of the second LeaderAgent
+  Vehicle* pSecondLeader = new LeaderAgent(this,
+	  SpawnPos,                 //initial position
+	  RandFloat()*TwoPi,        //start rotation
+	  Vector2D(0, 0),            //velocity
+	  Prm.VehicleMass,          //mass
+	  Prm.MaxSteeringForce,     //max force
+	  Prm.MaxSpeed,             //max velocity
+	  Prm.MaxTurnRatePerSecond, //max turn rate
+	  Prm.VehicleScale);        //scale
+
+  pSecondLeader_temp = pSecondLeader;
+
+  dynamic_cast<LeaderAgent*>(pLeader)->OnMoving();
+
+  // Creation of the HumanLeader
+
+  Vehicle* pHumanLeader = new HumanLeader(this,
+	  SpawnPos,                 //initial position
+	  RandFloat()*TwoPi,        //start rotation
+	  Vector2D(0, 0),            //velocity
+	  Prm.VehicleMass,          //mass
+	  Prm.MaxSteeringForce,     //max force
+	  Prm.MaxSpeed,             //max velocity
+	  Prm.MaxTurnRatePerSecond, //max turn rate
+	  Prm.VehicleScale);        //scale
+
+  pHumanLeader_temp = pHumanLeader;
+  
 
   Vehicle* pVehicleTemp = pLeader;
 
@@ -96,7 +139,7 @@ GameWorld::GameWorld(int cx, int cy):
 			  Prm.VehicleScale);        //scale
 
 		  dynamic_cast<FollowAgent*>(pVehicle)->FlockingOn();
-		  dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit(pVehicleTemp);
+		  dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit(pVehicleTemp, Vector2D(5,5));
 
 		  pVehicleTemp = pVehicle;
 
@@ -121,7 +164,7 @@ GameWorld::GameWorld(int cx, int cy):
 			  Prm.VehicleScale);        //scale
 
 		  dynamic_cast<FollowAgent*>(pVehicle)->FlockingOn();
-		  dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit(pVehicleTemp);
+		  dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit(pVehicleTemp, Vector2D(5, 5));
 
 		  pVehicleTemp = pVehicle;
 
@@ -202,12 +245,12 @@ void GameWorld::Update(double time_elapsed)
 		if (dist1 < dist2)
 		{
 			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OffPursuit();
-			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OnPursuit(m_Vehicles[0]);
+			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OnPursuit(m_Vehicles[0], Vector2D(5, 5));
 		}
 		else
 		{
 			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OffPursuit();
-			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OnPursuit(m_Vehicles[1]);
+			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OnPursuit(m_Vehicles[1], Vector2D(5, 5));
 		}
 	}
 	m_Vehicles[a]->Update(time_elapsed);
@@ -600,21 +643,11 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 
 			  if (RenderHumanLeader())
 			  {
-				  Vector2D SpawnPos = Vector2D(2.0, 2.0);
 
-				  m_Vehicles.erase(m_Vehicles.begin());
-				  Vehicle* pLeader = new LeaderAgent(this,
-					  SpawnPos,                 //initial position
-					  RandFloat()*TwoPi,        //start rotation
-					  Vector2D(0, 0),            //velocity
-					  Prm.VehicleMass,          //mass
-					  Prm.MaxSteeringForce,     //max force
-					  Prm.MaxSpeed,             //max velocity
-					  Prm.MaxTurnRatePerSecond, //max turn rate
-					  Prm.VehicleScale);        //scale
-
-				  m_Vehicles.insert(m_Vehicles.begin(), pLeader);
-				  //dynamic_cast<FollowAgent*>(m_Vehicles[1]).OnPursuit();
+				  m_Vehicles.insert(m_Vehicles.begin(), pLeader_temp);
+				  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(2.0, 2.0));
+				  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(5.0, 5.0));
+				  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(10.0, 10.0));
 			  }
 
 	  }
@@ -630,19 +663,10 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 		  	  //determine a random starting position
 	  Vector2D SpawnPos = Vector2D( 2.0, 2.0);
 
-		  // Creation of the second LeaderAgent
-		  Vehicle* pSecondLeader = new LeaderAgent(this,
-			  SpawnPos,                 //initial position
-			  RandFloat()*TwoPi,        //start rotation
-			  Vector2D(0, 0),            //velocity
-			  Prm.VehicleMass,          //mass
-			  Prm.MaxSteeringForce,     //max force
-			  Prm.MaxSpeed,             //max velocity
-			  Prm.MaxTurnRatePerSecond, //max turn rate
-			  Prm.VehicleScale);        //scale
+		  
 
-		  dynamic_cast<LeaderAgent*>(pSecondLeader)->OnMoving();
-		  m_Vehicles.insert(m_Vehicles.begin() +1, pSecondLeader);
+		  dynamic_cast<LeaderAgent*>(pSecondLeader_temp)->OnMoving();
+		  m_Vehicles.insert(m_Vehicles.begin() +1, pSecondLeader_temp);
 
 		  m_bTwoLeader = true;
 	  }
