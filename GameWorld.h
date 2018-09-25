@@ -66,6 +66,8 @@ private:
   bool  m_bViewKeys;
   bool  m_bShowCellSpaceInfo;
   bool  m_bHumanLeader;
+  bool  m_bOneLeader;
+  bool  m_bTwoLeader;
 
   void CreateObstacles();
 
@@ -124,6 +126,8 @@ public:
   bool  RenderFeelers()const{return m_bShowFeelers;}
   bool  RenderSteeringForce()const{return m_bShowSteeringForce;}
   bool  RenderHumanLeader()const { return m_bHumanLeader; }
+  bool  RenderOneLeader()const { return m_bOneLeader; }
+  bool  RenderTwoLeader()const { return m_bTwoLeader; }
 
   bool  RenderFPS()const{return m_bShowFPS;}
   void  ToggleShowFPS(){m_bShowFPS = !m_bShowFPS;}

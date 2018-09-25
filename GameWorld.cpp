@@ -42,7 +42,9 @@ GameWorld::GameWorld(int cx, int cy):
             m_bRenderNeighbors(false),
             m_bViewKeys(false),
             m_bShowCellSpaceInfo(false),
-			m_bHumanLeader(false)
+			m_bHumanLeader(false),
+			m_bOneLeader(true),
+			m_bTwoLeader(false)
 {
 
   //setup the spatial subdivision class
@@ -71,21 +73,6 @@ GameWorld::GameWorld(int cx, int cy):
 
   Vehicle* pVehicleTemp = pLeader;
 
-  // Creation of the second LeaderAgent
-  Vehicle* pSecondLeader = new LeaderAgent(this,
-	  SpawnPos,                 //initial position
-	  RandFloat()*TwoPi,        //start rotation
-	  Vector2D(0, 0),            //velocity
-	  Prm.VehicleMass,          //mass
-	  Prm.MaxSteeringForce,     //max force
-	  Prm.MaxSpeed,             //max velocity
-	  Prm.MaxTurnRatePerSecond, //max turn rate
-	  Prm.VehicleScale);        //scale
-
-  dynamic_cast<LeaderAgent*>(pSecondLeader)->OnMoving();
-  m_Vehicles.push_back(pSecondLeader);
-
-
   //setup the agents
   for (int a=0; a<Prm.NumAgents; ++a)
   {
@@ -93,6 +80,7 @@ GameWorld::GameWorld(int cx, int cy):
 	  Vector2D SpawnPos = Vector2D(cx / 2.0 + RandomClamped()*cx / 2.0,
 								cy / 2.0 + RandomClamped()*cy / 2.0);
 
+	  // If it's the firts FollowAgent, he follows the LeaderAgent
 	  if (a == 0) {
 		  Vehicle* pVehicle = new FollowAgent(this,
 			  SpawnPos,                 //initial position
@@ -106,7 +94,6 @@ GameWorld::GameWorld(int cx, int cy):
 
 		  dynamic_cast<FollowAgent*>(pVehicle)->FlockingOn();
 		  dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit(pVehicleTemp);
-		  dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit(pSecondLeader);
 
 		  pVehicleTemp = pVehicle;
 
@@ -116,6 +103,7 @@ GameWorld::GameWorld(int cx, int cy):
 		  m_pCellSpace->AddEntity(pVehicle);
 
 	  }
+	  // Otherwise, he follows the FollowAgent in front of him.
 	  else
 	  {
 
@@ -597,9 +585,35 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 
 	  case IDA_ONE_LEADER:
 	  {
-		  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_CHECKED);
-		  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_UNCHECKED);
-		  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_UNCHECKED);  
+			  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_CHECKED);
+			  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_UNCHECKED);
+			  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_UNCHECKED);
+
+			  if (RenderTwoLeader()) 
+			  {
+				  m_Vehicles.erase(m_Vehicles.begin() + 1);
+				  m_bTwoLeader = false;
+			  }
+
+			  if (RenderHumanLeader())
+			  {
+				  Vector2D SpawnPos = Vector2D(2.0, 2.0);
+
+				  m_Vehicles.erase(m_Vehicles.begin());
+				  Vehicle* pLeader = new LeaderAgent(this,
+					  SpawnPos,                 //initial position
+					  RandFloat()*TwoPi,        //start rotation
+					  Vector2D(0, 0),            //velocity
+					  Prm.VehicleMass,          //mass
+					  Prm.MaxSteeringForce,     //max force
+					  Prm.MaxSpeed,             //max velocity
+					  Prm.MaxTurnRatePerSecond, //max turn rate
+					  Prm.VehicleScale);        //scale
+
+				  m_Vehicles.insert(m_Vehicles.begin(), pLeader);
+				  //dynamic_cast<FollowAgent*>(m_Vehicles[1]).OnPursuit();
+			  }
+
 	  }
 
 	  break;
@@ -609,6 +623,25 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 		  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_CHECKED);
 		  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_UNCHECKED);
+
+		  	  //determine a random starting position
+	  Vector2D SpawnPos = Vector2D( 2.0, 2.0);
+
+		  // Creation of the second LeaderAgent
+		  Vehicle* pSecondLeader = new LeaderAgent(this,
+			  SpawnPos,                 //initial position
+			  RandFloat()*TwoPi,        //start rotation
+			  Vector2D(0, 0),            //velocity
+			  Prm.VehicleMass,          //mass
+			  Prm.MaxSteeringForce,     //max force
+			  Prm.MaxSpeed,             //max velocity
+			  Prm.MaxTurnRatePerSecond, //max turn rate
+			  Prm.VehicleScale);        //scale
+
+		  dynamic_cast<LeaderAgent*>(pSecondLeader)->OnMoving();
+		  m_Vehicles.insert(m_Vehicles.begin() +1, pSecondLeader);
+
+		  m_bTwoLeader = true;
 	  }
 
 	  break;
