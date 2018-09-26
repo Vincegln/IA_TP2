@@ -648,7 +648,10 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 				  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(2.0, 2.0));
 				  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(5.0, 5.0));
 				  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(10.0, 10.0));
+				  m_bHumanLeader = false;
 			  }
+
+			  m_bOneLeader = true;
 
 	  }
 
@@ -660,13 +663,23 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 		  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_CHECKED);
 		  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_UNCHECKED);
 
-		  	  //determine a random starting position
-	  Vector2D SpawnPos = Vector2D( 2.0, 2.0);
+		  if (RenderOneLeader()) 
+		  {
+			  //determine a random starting position
+			  Vector2D SpawnPos = Vector2D(2.0, 2.0);
 
-		  
-
-		  dynamic_cast<LeaderAgent*>(pSecondLeader_temp)->OnMoving();
-		  m_Vehicles.insert(m_Vehicles.begin() +1, pSecondLeader_temp);
+			  dynamic_cast<LeaderAgent*>(pSecondLeader_temp)->OnMoving();
+			  m_Vehicles.insert(m_Vehicles.begin() + 1, pSecondLeader_temp);
+			  m_bOneLeader = false;
+		  }
+		  if (RenderHumanLeader())
+		  {
+			  m_Vehicles.erase(m_Vehicles.begin());
+			  m_Vehicles.insert(m_Vehicles.begin(), pLeader_temp);
+			  m_Vehicles.insert(m_Vehicles.begin() + 1, pSecondLeader_temp);
+			  m_bHumanLeader = false;
+		  }
+		  	 
 
 		  m_bTwoLeader = true;
 	  }
@@ -678,9 +691,45 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 		  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_CHECKED);
+
+		  if (RenderOneLeader())
+		  {
+			  m_Vehicles.erase(m_Vehicles.begin());
+			  m_Vehicles.insert(m_Vehicles.begin(), pHumanLeader_temp);
+		  }
+		  if (RenderTwoLeader())
+		  {
+			  m_Vehicles.erase(m_Vehicles.begin());
+			  m_Vehicles.erase(m_Vehicles.begin());
+			  m_Vehicles.insert(m_Vehicles.begin(), pHumanLeader_temp);
+		  }
 	  }
       break;
-      
+
+	  case IDN_TWENTY_AGENT:
+	  {
+		  ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_UNCHECKED);
+	  }
+	  break;
+
+	  case IDN_FIFTY_AGENT:
+	  {
+		  ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_UNCHECKED);
+	  }
+	  break;
+
+	  case IDN_HUNDRED_AGENT:
+	  {
+		  ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_CHECKED);
+	  }
+	  break;
+
   }//end switch
 }
 
