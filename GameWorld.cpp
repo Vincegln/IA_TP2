@@ -72,10 +72,10 @@ GameWorld::GameWorld(int cx, int cy):
 	  cy / 2.0 + RandomClamped()*cy / 2.0);
 
   // Creation of the LeaderAgent
-  Vehicle* pLeader = new LeaderAgent(this,
+  Vehicle* pLeader = new HumanLeader(this,
 	  SpawnPos,                 //initial position
 	  RandFloat()*TwoPi,        //start rotation
-	  Vector2D(0, 0),            //velocity
+	  Vector2D(100, 100),            //velocity
 	  Prm.VehicleMass,          //mass
 	  Prm.MaxSteeringForce,     //max force
 	  Prm.MaxSpeed,             //max velocity
@@ -429,6 +429,57 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
         }
         break;
 
+	case 'Z':
+		break;
+	
+	case 'S':
+		break;
+
+	case 'D':
+		break;
+
+	case 'Q':
+		Vector2D target = m_Vehicles[0]->Pos();
+		target.Normalize();
+		double speedX = m_Vehicles[0]->Velocity().x;
+		double speedY = m_Vehicles[0]->Velocity().y;
+
+		if (target.x < 0)
+		{
+			if (target.y < 0)
+			{
+				target.x += speedX;
+				target.y += -speedY;
+			}
+			else
+			{
+				target.x += -speedX;
+				target.y += -speedY;
+			}
+
+		}
+		else
+		{
+			if (target.y < 0)
+			{
+				target.x += speedX;
+				target.y += speedY;
+			}
+			else
+			{
+				target.x += -speedX;
+				target.y += speedY;
+			}
+		}
+
+		target.Normalize();
+		Vector2D Target = PointToWorldSpace(target,
+			m_Vehicles[0]->Heading(),
+			m_Vehicles[0]->Side(),
+			m_Vehicles[0]->Pos());
+
+		m_Vehicles[0]->SetPos(Target);
+		break;
 
   }//end switch
 }
