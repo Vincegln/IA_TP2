@@ -762,6 +762,26 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 		  ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_CHECKED);
 		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_UNCHECKED);
+
+		  if (RenderFiftyAgent())
+		  {
+			  for (int i = 20; i < 50; i++)
+			  {
+				  m_Vehicles.erase(m_Vehicles.begin() + i);
+			  }
+			  m_bFiftyAgent = false;
+
+		  }
+		  if (RenderHundredAgent())
+		  {
+			  for (int i = 20; i < 100; i++)
+			  {
+				  m_Vehicles.erase(m_Vehicles.begin() + i);
+			  }
+			  m_bHundredAgent = false;
+		  }
+
+		  m_bTwentyAgent = true;
 	  }
 	  break;
 
@@ -770,6 +790,17 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 		  ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_CHECKED);
 		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_UNCHECKED);
+
+		  if (RenderTwentyAgent())
+		  {
+
+		  }
+		  if (RenderHundredAgent())
+		  {
+
+		  }
+
+		  m_bFiftyAgent = true;
 	  }
 	  break;
 
@@ -778,6 +809,8 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 		  ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_CHECKED);
+
+		  m_bHundredAgent = true;
 	  }
 	  break;
 
