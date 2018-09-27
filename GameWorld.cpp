@@ -938,6 +938,57 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 	  }
 	  break;
 
+	  case IDO_TWO_OFFSET:
+	  {
+		  ChangeMenuState(hwnd, IDO_TWO_OFFSET, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_UNCHECKED);
+
+		  if (RenderFiveOffset())
+		  {
+			  if (RenderTwentyAgent())
+			  {
+				  for (int i = 1; i < 20; i++)
+				  {
+					  if (i == 0)
+					  {
+
+					  }
+				  }
+			  }
+		  }
+		  if (RenderTenOffset())
+		  {
+
+		  }
+
+		  m_bTwoOffset = true;
+	  }
+
+	  break;
+
+	  case IDO_FIVE_OFFSET:
+	  {
+		  ChangeMenuState(hwnd, IDO_TWO_OFFSET, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_UNCHECKED);
+
+		  m_bFiveOffset = true;
+	  }
+
+	  break;
+
+	  case IDO_TEN_OFFSET:
+	  {
+		  ChangeMenuState(hwnd, IDO_TWO_OFFSET, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_UNCHECKED);
+
+		  m_bTenOffset = true;
+	  }
+
+	  break;
+
   }//end switch
 }
 
