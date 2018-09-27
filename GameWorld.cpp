@@ -749,6 +749,7 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 			  m_bTwoLeader = false;
 		  }
 	  }
+	  m_bHumanLeader = true;
       break;
 
 	  case IDN_TWENTY_AGENT:
