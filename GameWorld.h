@@ -74,6 +74,7 @@ private:
   bool  m_bTwoOffset;
   bool  m_bFiveOffset;
   bool  m_bTenOffset;
+  bool  m_bWeightedSum;
   
 
   void CreateObstacles();
@@ -153,6 +154,8 @@ public:
   
   void  ToggleViewKeys(){m_bViewKeys = !m_bViewKeys;}
   bool  ViewKeys()const{return m_bViewKeys;}
+
+  bool RenderWeightedSum()const { return m_bWeightedSum; }
 
 };
 

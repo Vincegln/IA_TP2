@@ -53,7 +53,7 @@ Vehicle::Vehicle(GameWorld* world,
 //-----------------------------------------------------------------------
 Vehicle::~Vehicle()
 {
-  delete m_pSteering;
+  //delete m_pSteering;
   delete m_pHeadingSmoother;
 }
 
