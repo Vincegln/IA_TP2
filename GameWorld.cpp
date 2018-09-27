@@ -22,10 +22,10 @@
 using std::list;
 
 // Creation of the two LeaderAgent and HumanAgent
-//Vehicle* pLeader_temp;
-//Vehicle* pSecondLeader_temp;
-//Vehicle* pHumanLeader_temp;
-//Vehicle* pFollow_Temp;
+Vehicle* pLeader_temp;
+Vehicle* pSecondLeader_temp;
+Vehicle* pHumanLeader_temp;
+
 
 
 
@@ -82,7 +82,7 @@ GameWorld::GameWorld(int cx, int cy):
 	  Prm.MaxTurnRatePerSecond, //max turn rate
 	  Prm.VehicleScale);        //scale
 
-  //pLeader_temp = pLeader;
+  pLeader_temp = pLeader;
 
   dynamic_cast<LeaderAgent*>(pLeader)->OnMoving();
   m_Vehicles.push_back(pLeader);
@@ -98,7 +98,7 @@ GameWorld::GameWorld(int cx, int cy):
 	  Prm.MaxTurnRatePerSecond, //max turn rate
 	  Prm.VehicleScale);        //scale
 
-  //pSecondLeader_temp = pSecondLeader;
+  pSecondLeader_temp = pSecondLeader;
 
   dynamic_cast<LeaderAgent*>(pLeader)->OnMoving();
 
@@ -114,7 +114,7 @@ GameWorld::GameWorld(int cx, int cy):
 	  Prm.MaxTurnRatePerSecond, //max turn rate
 	  Prm.VehicleScale);        //scale
 
-  //pHumanLeader_temp = pHumanLeader;
+  pHumanLeader_temp = pHumanLeader;
   
 
   Vehicle* pVehicleTemp = pLeader;
@@ -695,11 +695,11 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 			  if (RenderHumanLeader())
 			  {
 
-				  //m_Vehicles.insert(m_Vehicles.begin(), pLeader_temp);
-				  //if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(2.0, 2.0));
-				  //if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(5.0, 5.0));
-				  //if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(10.0, 10.0));
-				  //m_bHumanLeader = false;
+				  m_Vehicles.insert(m_Vehicles.begin(), pLeader_temp);
+				  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(2.0, 2.0));
+				  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(5.0, 5.0));
+				  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(10.0, 10.0));
+				  m_bHumanLeader = false;
 			  }
 
 			  m_bOneLeader = true;
@@ -719,19 +719,16 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 			  //determine a random starting position
 			  Vector2D SpawnPos = Vector2D(2.0, 2.0);
 
-			  //dynamic_cast<LeaderAgent*>(pSecondLeader_temp)->OnMoving();
-			  //m_Vehicles.insert(m_Vehicles.begin() + 1, pSecondLeader_temp);
+			  dynamic_cast<LeaderAgent*>(pSecondLeader_temp)->OnMoving();
+			  m_Vehicles.insert(m_Vehicles.begin() + 1, pSecondLeader_temp);
 			  m_bOneLeader = false;
 		  }
 		  if (RenderHumanLeader())
 		  {
-			  //m_Vehicles.erase(m_Vehicles.begin());
-			  //m_Vehicles.insert(m_Vehicles.begin(), pLeader_temp);
-			  //if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(2.0, 2.0));
-			  //if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(5.0, 5.0));
-			  //if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, Vector2D(10.0, 10.0));
-			  //m_Vehicles.insert(m_Vehicles.begin() + 1, pSecondLeader_temp);
-			  //m_bHumanLeader = false;
+			  m_Vehicles.erase(m_Vehicles.begin());
+			  m_Vehicles.insert(m_Vehicles.begin(), pLeader_temp);
+			  m_Vehicles.insert(m_Vehicles.begin() + 1, pSecondLeader_temp);
+			  m_bHumanLeader = false;
 		  }
 		  	 
 
@@ -748,24 +745,14 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 
 		  if (RenderOneLeader())
 		  {
-		/*	  m_Vehicles.erase(m_Vehicles.begin());
+			  m_Vehicles.erase(m_Vehicles.begin());
 			  m_Vehicles.insert(m_Vehicles.begin(), pHumanLeader_temp);
-			  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, Vector2D(2.0, 2.0));
-			  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, Vector2D(5.0, 5.0));
-			  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, Vector2D(10.0, 10.0));
-
-			  m_bOneLeader = false;
 		  }
 		  if (RenderTwoLeader())
 		  {
 			  m_Vehicles.erase(m_Vehicles.begin());
 			  m_Vehicles.erase(m_Vehicles.begin());
 			  m_Vehicles.insert(m_Vehicles.begin(), pHumanLeader_temp);
-			  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, Vector2D(2.0, 2.0));
-			  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, Vector2D(5.0, 5.0));
-			  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, Vector2D(10.0, 10.0));
-
-			  m_bTwoLeader = false;*/
 		  }
 	  }
       break;
@@ -776,13 +763,11 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_UNCHECKED);
 
-		  /*if (RenderFiftyAgent())
+		  if (RenderFiftyAgent())
 		  {
 			  for (int i = 20; i < 50; i++)
 			  {
-				  pFollow_Temp = m_Vehicles[i];
 				  m_Vehicles.erase(m_Vehicles.begin() + i);
-				  delete pFollow_Temp;
 			  }
 			  m_bFiftyAgent = false;
 
@@ -791,13 +776,12 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 		  {
 			  for (int i = 20; i < 100; i++)
 			  {
-				  pFollow_Temp = m_Vehicles[i];
 				  m_Vehicles.erase(m_Vehicles.begin() + i);
 			  }
 			  m_bHundredAgent = false;
 		  }
 
-		  m_bTwentyAgent = true;*/
+		  m_bTwentyAgent = true;
 	  }
 	  break;
 
@@ -807,43 +791,16 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_CHECKED);
 		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_UNCHECKED);
 
-		  //if (RenderTwentyAgent())
-		  //{
-			 // for (int i = 0; i < 30; i++) 
-			 // {
-				//  Vector2D SpawnPos = Vector2D(2.0, 2.0);
+		  if (RenderTwentyAgent())
+		  {
 
-				//  Vehicle* pVehicle = new FollowAgent(this,
-				//	  SpawnPos,                 //initial position
-				//	  RandFloat()*TwoPi,        //start rotation
-				//	  Vector2D(0, 0),            //velocity
-				//	  Prm.VehicleMass,          //mass
-				//	  Prm.MaxSteeringForce,     //max force
-				//	  Prm.MaxSpeed,             //max velocity
-				//	  Prm.MaxTurnRatePerSecond, //max turn rate
-				//	  Prm.VehicleScale);        //scale
+		  }
+		  if (RenderHundredAgent())
+		  {
 
-				//  if (RenderTwoOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()], Vector2D(2.0, 2.0));
-				//  if (RenderFiveOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()], Vector2D(5.0, 5.0));
-				//  if (RenderTenOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()], Vector2D(10.0, 10.0));
-				//  m_Vehicles.push_back(pVehicle);
+		  }
 
-				// 
-			 // }
-			 // m_bTwentyAgent = false;
-		  //}
-		  //if (RenderHundredAgent())
-		  //{
-			 // for (int i = 50; i < 100; i++)
-			 // {
-				//  pFollow_Temp = m_Vehicles[i];
-				//  m_Vehicles.erase(m_Vehicles.begin() + i);
-				//  delete pFollow_Temp;
-			 // }
-			 // m_bHundredAgent = false;
-		  //}
-
-		  //m_bFiftyAgent = true;
+		  m_bFiftyAgent = true;
 	  }
 	  break;
 
@@ -853,59 +810,7 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_CHECKED);
 
-		  //if (RenderTwentyAgent())
-		  //{
-			 // for (int i = 0; i < 100; i++)
-			 // {
-				//  Vector2D SpawnPos = Vector2D(2.0, 2.0);
-
-				//  Vehicle* pVehicle = new FollowAgent(this,
-				//	  SpawnPos,                 //initial position
-				//	  RandFloat()*TwoPi,        //start rotation
-				//	  Vector2D(0, 0),            //velocity
-				//	  Prm.VehicleMass,          //mass
-				//	  Prm.MaxSteeringForce,     //max force
-				//	  Prm.MaxSpeed,             //max velocity
-				//	  Prm.MaxTurnRatePerSecond, //max turn rate
-				//	  Prm.VehicleScale);        //scale
-
-				//  if (RenderTwoOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()], Vector2D(2.0, 2.0));
-				//  if (RenderFiveOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()], Vector2D(5.0, 5.0));
-				//  if (RenderTenOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()], Vector2D(10.0, 10.0));
-				//  m_Vehicles.push_back(pVehicle);
-
-
-			 // }
-			 // m_bTwentyAgent = false;
-		  //}
-
-		  //if (RenderFiftyAgent())
-		  //{
-			 // for (int i = 0; i < 50; i++)
-			 // {
-				//  Vector2D SpawnPos = Vector2D(2.0, 2.0);
-
-				//  Vehicle* pVehicle = new FollowAgent(this,
-				//	  SpawnPos,                 //initial position
-				//	  RandFloat()*TwoPi,        //start rotation
-				//	  Vector2D(0, 0),            //velocity
-				//	  Prm.VehicleMass,          //mass
-				//	  Prm.MaxSteeringForce,     //max force
-				//	  Prm.MaxSpeed,             //max velocity
-				//	  Prm.MaxTurnRatePerSecond, //max turn rate
-				//	  Prm.VehicleScale);        //scale
-
-				//  if (RenderTwoOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()], Vector2D(2.0, 2.0));
-				//  if (RenderFiveOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()], Vector2D(5.0, 5.0));
-				//  if (RenderTenOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()], Vector2D(10.0, 10.0));
-				//  m_Vehicles.push_back(pVehicle);
-
-
-			 // }
-			 // m_bFiftyAgent = false;
-		  //}
-
-		  //m_bHundredAgent = true;
+		  m_bHundredAgent = true;
 	  }
 	  break;
 
