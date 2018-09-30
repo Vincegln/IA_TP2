@@ -10,11 +10,17 @@ class FollowAgent : public Vehicle
 {
 
 private:
+	// flags who allow us to know if these steeringBehaviors are activated
+
+	// Flag to know if the flocking is enable
 	bool flocking;
+
+	// Flag to know if the pursuit is enable
 	bool pursuit;
 
 public:
 
+	// Constructor
 	FollowAgent(GameWorld* world,
 		Vector2D position,
 		double    rotation,
@@ -25,6 +31,7 @@ public:
 		double    max_turn_rate,
 		double    scale);
 
+	// Destructor
 	~FollowAgent();
 
 

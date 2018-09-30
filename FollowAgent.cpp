@@ -1,6 +1,7 @@
 #include "FollowAgent.h"
 #include "SteeringBehaviors.h"
 
+// Constructor
 FollowAgent::FollowAgent(GameWorld* world,
 	Vector2D position,
 	double    rotation,
@@ -21,10 +22,12 @@ FollowAgent::FollowAgent(GameWorld* world,
 		max_turn_rate,
 		scale)
 {
+	// By default, a follow agent doesn't have a steeringBehavior
 	flocking = false;
 	pursuit = false;
 }
 
+// Destructor
 FollowAgent::~FollowAgent()
 {
 	Vehicle::~Vehicle();

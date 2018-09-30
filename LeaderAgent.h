@@ -11,9 +11,12 @@ class LeaderAgent : public Vehicle
 {
 
 private:
+
+	// Flag to know is the leader agent is moving
 	bool moving;
 public:
 
+	// Constructor
 	LeaderAgent(GameWorld* world,
 		Vector2D position,
 		double    rotation,
@@ -24,6 +27,7 @@ public:
 		double    max_turn_rate,
 		double    scale);
 
+	// Destructor
 	~LeaderAgent();
 
 	//-------------------------------------------accessor methods

@@ -76,7 +76,7 @@ GameWorld::GameWorld(int cx, int cy):
   Vector2D SpawnPos = Vector2D(cx / 2.0 + RandomClamped()*cx / 2.0,
 	  cy / 2.0 + RandomClamped()*cy / 2.0);
 
-  // Creation of the LeaderAgent
+  // Creation of the first LeaderAgent
   Vehicle* pLeader = new LeaderAgent(this,
 	  SpawnPos,                 //initial position
 	  RandFloat()*TwoPi,        //start rotation
@@ -87,9 +87,12 @@ GameWorld::GameWorld(int cx, int cy):
 	  Prm.MaxTurnRatePerSecond, //max turn rate
 	  Prm.VehicleScale);        //scale
 
+  // We initialize a pointer that will help to refer to the First Leader.
   pLeader_temp = pLeader;
 
+  // We give the movement to the first leader.
   dynamic_cast<LeaderAgent*>(pLeader)->OnMoving();
+  // We put it onto the list of Vehicles on the screen
   m_Vehicles.push_back(pLeader);
 
   // Creation of the second LeaderAgent
@@ -103,8 +106,10 @@ GameWorld::GameWorld(int cx, int cy):
 	  Prm.MaxTurnRatePerSecond, //max turn rate
 	  Prm.VehicleScale);        //scale
 
+  // We initialize a pointer that will help to refer to the Second Leader.
   pSecondLeader_temp = pSecondLeader;
 
+  // We give the movement to the second leader.
   dynamic_cast<LeaderAgent*>(pLeader)->OnMoving();
 
   // Creation of the HumanLeader
@@ -119,9 +124,10 @@ GameWorld::GameWorld(int cx, int cy):
 	  Prm.MaxTurnRatePerSecond, //max turn rate
 	  Prm.VehicleScale);        //scale
 
+  // We initialize a pointer that will help to refer to the Human Leader.
   pHumanLeader_temp = pHumanLeader;
   
-
+  // We initialize a pointer that will help to build the follow Agents.
   Vehicle* pVehicleTemp = pLeader;
 
   //setup the agents
@@ -131,7 +137,7 @@ GameWorld::GameWorld(int cx, int cy):
 	Vector2D SpawnPos = Vector2D(cx / 2.0 + RandomClamped()*cx / 2.0,
 								cy / 2.0 + RandomClamped()*cy / 2.0);
 
-	  // If it's the firts FollowAgent, he follows the LeaderAgent
+	// If it's the firts FollowAgent, he follows the LeaderAgent
 	  
 	Vehicle* pVehicle = new FollowAgent(this,
 		SpawnPos,                 //initial position
@@ -143,11 +149,13 @@ GameWorld::GameWorld(int cx, int cy):
 		Prm.MaxTurnRatePerSecond, //max turn rate
 		Prm.VehicleScale);        //scale
 
-	//dynamic_cast<FollowAgent*>(pVehicle)->FlockingOn();
+	// All the follow Agent follows the Vehicle above him in the list.
 	dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit(pVehicleTemp, *offsetFive);
 
+	// We change the pointer for the new Follow Agent
 	pVehicleTemp = pVehicle;
 
+	// We put it onto the list of Vehicles on the screen
 	m_Vehicles.push_back(pVehicle);
 
 	//add it to the cell subdivision
