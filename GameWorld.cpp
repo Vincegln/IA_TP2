@@ -63,7 +63,8 @@ GameWorld::GameWorld(int cx, int cy):
 			m_bTwentyAgent(true),
 			m_bFiftyAgent(false),
 			m_bHundredAgent(false),
-			m_bWeightedSum(false)
+			m_bWeightedSum(false),
+			humanSpeed(100)
 {
 
   //setup the spatial subdivision class
@@ -112,7 +113,7 @@ GameWorld::GameWorld(int cx, int cy):
   Vehicle* pHumanLeader = new HumanLeader(this,
 	  SpawnPos,                 //initial position
 	  RandFloat()*TwoPi,        //start rotation
-	  Vector2D(0, 0),            //velocity
+	  Vector2D(100, 100),            //velocity
 	  Prm.VehicleMass,          //mass
 	  Prm.MaxSteeringForce,     //max force
 	  Prm.MaxSpeed,             //max velocity
@@ -345,6 +346,8 @@ void GameWorld::SetCrosshair(POINTS p)
 //------------------------- HandleKeyPresses -----------------------------
 void GameWorld::HandleKeyPresses(WPARAM wParam)
 {
+	Vector2D Target;
+	double angle;
 
   switch(wParam)
   {
@@ -405,56 +408,94 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
         }
         break;
 
-	case 'Z':
+	/*case 'Z':
+		Target = m_Vehicles[0]->Velocity();
+		Target.x = 0;
+		Target.y = -100;
+		m_Vehicles[0]->SetVelocity(Target);
+		m_Vehicles[0]->Update(0.001);
 		break;
 	
 	case 'S':
+		Target = m_Vehicles[0]->Velocity();
+		Target.x = 0;
+		Target.y = 100;
+		m_Vehicles[0]->SetVelocity(Target);
+		m_Vehicles[0]->Update(0.001);
 		break;
 
 	case 'D':
+		Target = m_Vehicles[0]->Velocity();
+		Target.x = 100;
+		Target.y = 0;
+		m_Vehicles[0]->SetVelocity(Target);
+		m_Vehicles[0]->Update(0.001);
 		break;
 
 	case 'Q':
-		Vector2D target = m_Vehicles[0]->Pos();
-		target.Normalize();
-		double speedX = m_Vehicles[0]->Velocity().x;
-		double speedY = m_Vehicles[0]->Velocity().y;
-
-		if (target.x < 0)
-		{
-			if (target.y < 0)
-			{
-				target.x += speedX;
-				target.y += -speedY;
-			}
-			else
-			{
-				target.x += -speedX;
-				target.y += -speedY;
-			}
-
+		Target = m_Vehicles[0]->Velocity();
+		Target.x = -100;
+		Target.y = 0;
+		m_Vehicles[0]->SetVelocity(Target);
+		m_Vehicles[0]->Update(0.001);
+		break;
+	*/
+	case 'Z':
+		humanSpeed += 100;
+		Target = m_Vehicles[0]->Velocity();
+		Target.Normalize();
+		Target = Target * humanSpeed;
+		m_Vehicles[0]->SetVelocity(Target);
+		m_Vehicles[0]->Update(0.001);
+		break;
+	
+	case 'S':
+		if (humanSpeed > 100) {
+			humanSpeed -= 100;
 		}
-		else
-		{
-			if (target.y < 0)
-			{
-				target.x += speedX;
-				target.y += speedY;
-			}
-			else
-			{
-				target.x += -speedX;
-				target.y += speedY;
-			}
+		Target = m_Vehicles[0]->Velocity();
+		Target.Normalize();
+		Target = Target * humanSpeed;
+		m_Vehicles[0]->SetVelocity(Target);
+		m_Vehicles[0]->Update(0.001);
+		break;
+
+	case 'D':
+		Target = m_Vehicles[0]->Velocity();
+		Target.Normalize();
+		angle = atan(Target.y/Target.x);
+		if (Target.x < 0) {
+			angle += Pi;
 		}
+		else if (Target.y < 0) {
+			angle += 2 * Pi;
+		}
+		angle = angle * (180.0/Pi);
+		angle += 7;
+		angle = angle * (Pi/180.0);
+		Target.x = humanSpeed * cos(angle);
+		Target.y = humanSpeed * sin(angle);
+		m_Vehicles[0]->SetVelocity(Target);
+		m_Vehicles[0]->Update(0.001);
+		break;
 
-		target.Normalize();
-		Vector2D Target = PointToWorldSpace(target,
-			m_Vehicles[0]->Heading(),
-			m_Vehicles[0]->Side(),
-			m_Vehicles[0]->Pos());
-
-		m_Vehicles[0]->SetPos(Target);
+	case 'Q':
+		Target = m_Vehicles[0]->Velocity();
+		Target.Normalize();
+		angle = atan(Target.y / Target.x);
+		if (Target.x < 0) {
+			angle += Pi;
+		}
+		else if (Target.y < 0) {
+			angle += 2 * Pi;
+		}
+		angle = angle * (180.0 / Pi);
+		angle -= 7;
+		angle = angle * (Pi / 180.0);
+		Target.x = humanSpeed * cos(angle);
+		Target.y = humanSpeed * sin(angle);
+		m_Vehicles[0]->SetVelocity(Target);
+		m_Vehicles[0]->Update(0.001);
 		break;
 
   }//end switch
