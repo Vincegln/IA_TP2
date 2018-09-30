@@ -915,27 +915,69 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 
 	  case IDO_TWO_OFFSET:
 	  {
-		  ChangeMenuState(hwnd, IDO_TWO_OFFSET, MFS_UNCHECKED);
-		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDO_TWO_OFFSET, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_UNCHECKED);
 
-		  if (RenderFiveOffset())
-		  {
 			  if (RenderTwentyAgent())
 			  {
 				  for (int i = 1; i < 20; i++)
 				  {
-					  if (i == 0)
+					  if (RenderTwoLeader())
 					  {
+						  if (i != 1)
+						  {
+							  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTwo);
+						  }
 
+					  }
+					  else
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTwo);
 					  }
 				  }
 			  }
-		  }
-		  if (RenderTenOffset())
-		  {
 
-		  }
+			  if (RenderFiftyAgent())
+			  {
+				  for (int i = 1; i < 50; i++)
+				  {
+					  if (RenderTwoLeader())
+					  {
+						  if (i != 1)
+						  {
+							  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTwo);
+						  }
+
+					  }
+					  else
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTwo);
+					  }
+				  }
+			  }
+
+			  if (RenderHundredAgent())
+			  {
+				  for (int i = 1; i < 100; i++)
+				  {
+					  if (RenderTwoLeader())
+					  {
+						  if (i != 1)
+						  {
+							  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTwo);
+						  }
+
+					  }
+					  else
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTwo);
+					  }
+				  }
+			  }
+
+			  m_bFiveOffset = false;
+			  m_bTenOffset = false;
 
 		  m_bTwoOffset = true;
 	  }
@@ -948,6 +990,64 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_CHECKED);
 		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_UNCHECKED);
 
+		  if (RenderTwentyAgent())
+		  {
+			  for (int i = 1; i < 20; i++)
+			  {
+				  if (RenderTwoLeader())
+				  {
+					  if (i != 1)
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetFive);
+					  }
+
+				  }
+				  else
+				  {
+					  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetFive);
+				  }
+			  }
+		  }
+
+		  if (RenderFiftyAgent())
+		  {
+			  for (int i = 1; i < 50; i++)
+			  {
+				  if (RenderTwoLeader())
+				  {
+					  if (i != 1)
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetFive);
+					  }
+
+				  }
+				  else
+				  {
+					  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetFive);
+				  }
+			  }
+		  }
+
+		  if (RenderHundredAgent())
+		  {
+			  for (int i = 1; i < 100; i++)
+			  {
+				  if (RenderTwoLeader())
+				  {
+					  if (i != 1)
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetFive);
+					  }
+
+				  }
+				  else
+				  {
+					  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetFive);
+				  }
+			  }
+		  }
+		  m_bTwoOffset = false;
+		  m_bTenOffset = false;
 		  m_bFiveOffset = true;
 	  }
 
@@ -956,9 +1056,67 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 	  case IDO_TEN_OFFSET:
 	  {
 		  ChangeMenuState(hwnd, IDO_TWO_OFFSET, MFS_UNCHECKED);
-		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_CHECKED);
-		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_CHECKED);
 
+		  if (RenderTwentyAgent())
+		  {
+			  for (int i = 1; i < 20; i++)
+			  {
+				  if (RenderTwoLeader())
+				  {
+					  if (i != 1)
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTen);
+					  }
+
+				  }
+				  else
+				  {
+					  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTen);
+				  }
+			  }
+		  }
+
+		  if (RenderFiftyAgent())
+		  {
+			  for (int i = 1; i < 50; i++)
+			  {
+				  if (RenderTwoLeader())
+				  {
+					  if (i != 1)
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTen);
+					  }
+
+				  }
+				  else
+				  {
+					  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTen);
+				  }
+			  }
+		  }
+
+		  if (RenderHundredAgent())
+		  {
+			  for (int i = 1; i < 100; i++)
+			  {
+				  if (RenderTwoLeader())
+				  {
+					  if (i != 1)
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTen);
+					  }
+
+				  }
+				  else
+				  {
+					  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTen);
+				  }
+			  }
+		  }
+		  m_bTwoOffset = false;
+		  m_bFiveOffset = false;
 		  m_bTenOffset = true;
 	  }
 

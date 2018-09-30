@@ -88,6 +88,7 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
          ChangeMenuState(hwnd, ID_VIEW_FPS, MFS_CHECKED);
 		 ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_CHECKED);
 		 ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_CHECKED);
+		 ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_CHECKED);
          
       }
 
