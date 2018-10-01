@@ -2,6 +2,9 @@
 #include "Vehicle.h"
 #include "SteeringBehaviors.h"
 #include "GameWorld.h"
+#include <vector>
+
+using namespace std;
 
 class GameWorld;
 class SteeringBehavior;
@@ -12,7 +15,7 @@ class FollowAgent : public Vehicle
 private:
 	bool flocking;
 	bool pursuit;
-
+	vector<Vehicle*> targets;
 public:
 
 	FollowAgent(GameWorld* world,
@@ -35,6 +38,9 @@ public:
 	void OnPursuit(Vehicle* vehicle, Vector2D offset) { this->Steering()->OffsetPursuitOn(vehicle, offset); pursuit = true; };
 	void OffPursuit() { this->Steering()->OffsetPursuitOff(); pursuit = false; };
 
+	void Update(double time_elapsed);
 
+	void AddTarget(Vehicle * vehicle);
+	void EmptyTargetList();
 };
 
