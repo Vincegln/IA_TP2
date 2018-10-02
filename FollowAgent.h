@@ -20,6 +20,9 @@ private:
 
 	// Flag to know if the pursuit is enable
 	bool pursuit;
+
+	// List of the targets that the FollowAgent will choose to follow
+	// by the distance between its targets and itself
 	vector<Vehicle*> targets;
 public:
 
