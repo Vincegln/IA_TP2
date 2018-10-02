@@ -52,7 +52,8 @@ private:
   //keeps track of the average FPS
   double                         m_dAvFrameTime;
 
-
+  // Constant velocity for the human leader
+  double						humanSpeed;
   //flags to turn aids and obstacles etc on/off
   bool  m_bShowWalls;
   bool  m_bShowObstacles;

@@ -63,7 +63,8 @@ GameWorld::GameWorld(int cx, int cy):
 			m_bTwentyAgent(true),
 			m_bFiftyAgent(false),
 			m_bHundredAgent(false),
-			m_bWeightedSum(false)
+			m_bWeightedSum(false),
+			humanSpeed(100)
 {
 
   //setup the spatial subdivision class
@@ -117,7 +118,7 @@ GameWorld::GameWorld(int cx, int cy):
   Vehicle* pHumanLeader = new HumanLeader(this,
 	  SpawnPos,                 //initial position
 	  RandFloat()*TwoPi,        //start rotation
-	  Vector2D(0, 0),            //velocity
+	  Vector2D(100, 100),            //velocity
 	  Prm.VehicleMass,          //mass
 	  Prm.MaxSteeringForce,     //max force
 	  Prm.MaxSpeed,             //max velocity
@@ -151,6 +152,7 @@ GameWorld::GameWorld(int cx, int cy):
 
 	// All the follow Agent follows the Vehicle above him in the list.
 	dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit(pVehicleTemp, *offsetFive);
+	dynamic_cast<FollowAgent*>(pVehicle)->AddTarget(pVehicleTemp);
 
 	// We change the pointer for the new Follow Agent
 	pVehicleTemp = pVehicle;
@@ -353,6 +355,8 @@ void GameWorld::SetCrosshair(POINTS p)
 //------------------------- HandleKeyPresses -----------------------------
 void GameWorld::HandleKeyPresses(WPARAM wParam)
 {
+	Vector2D Target;
+	double angle;
 
   switch(wParam)
   {
@@ -414,55 +418,61 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
         break;
 
 	case 'Z':
+		humanSpeed += 100;
+		Target = m_Vehicles[0]->Velocity();
+		Target.Normalize();
+		Target = Target * humanSpeed;
+		m_Vehicles[0]->SetVelocity(Target);
+		m_Vehicles[0]->Update(0.001);
 		break;
 	
 	case 'S':
+		if (humanSpeed > 100) {
+			humanSpeed -= 100;
+		}
+		Target = m_Vehicles[0]->Velocity();
+		Target.Normalize();
+		Target = Target * humanSpeed;
+		m_Vehicles[0]->SetVelocity(Target);
+		m_Vehicles[0]->Update(0.001);
 		break;
 
 	case 'D':
+		Target = m_Vehicles[0]->Velocity();
+		Target.Normalize();
+		angle = atan(Target.y/Target.x);
+		if (Target.x < 0) {
+			angle += Pi;
+		}
+		else if (Target.y < 0) {
+			angle += 2 * Pi;
+		}
+		angle = angle * (180.0/Pi);
+		angle += 7;
+		angle = angle * (Pi/180.0);
+		Target.x = humanSpeed * cos(angle);
+		Target.y = humanSpeed * sin(angle);
+		m_Vehicles[0]->SetVelocity(Target);
+		m_Vehicles[0]->Update(0.001);
 		break;
 
 	case 'Q':
-		Vector2D target = m_Vehicles[0]->Pos();
-		target.Normalize();
-		double speedX = m_Vehicles[0]->Velocity().x;
-		double speedY = m_Vehicles[0]->Velocity().y;
-
-		if (target.x < 0)
-		{
-			if (target.y < 0)
-			{
-				target.x += speedX;
-				target.y += -speedY;
-			}
-			else
-			{
-				target.x += -speedX;
-				target.y += -speedY;
-			}
-
+		Target = m_Vehicles[0]->Velocity();
+		Target.Normalize();
+		angle = atan(Target.y / Target.x);
+		if (Target.x < 0) {
+			angle += Pi;
 		}
-		else
-		{
-			if (target.y < 0)
-			{
-				target.x += speedX;
-				target.y += speedY;
-			}
-			else
-			{
-				target.x += -speedX;
-				target.y += speedY;
-			}
+		else if (Target.y < 0) {
+			angle += 2 * Pi;
 		}
-
-		target.Normalize();
-		Vector2D Target = PointToWorldSpace(target,
-			m_Vehicles[0]->Heading(),
-			m_Vehicles[0]->Side(),
-			m_Vehicles[0]->Pos());
-
-		m_Vehicles[0]->SetPos(Target);
+		angle = angle * (180.0 / Pi);
+		angle -= 7;
+		angle = angle * (Pi / 180.0);
+		Target.x = humanSpeed * cos(angle);
+		Target.y = humanSpeed * sin(angle);
+		m_Vehicles[0]->SetVelocity(Target);
+		m_Vehicles[0]->Update(0.001);
 		break;
 
   }//end switch
@@ -678,16 +688,20 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 			  if (RenderTwoLeader()) 
 			  {
 				  m_Vehicles.erase(m_Vehicles.begin() + 1);
+				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
+				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
 				  m_bTwoLeader = false;
 			  }
 
 			  if (RenderHumanLeader())
 			  {
-
+				  m_Vehicles.erase(m_Vehicles.begin());
 				  m_Vehicles.insert(m_Vehicles.begin(), pLeader_temp);
 				  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTwo);
 				  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetFive);
 				  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTen);
+				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
+				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
 				  m_bHumanLeader = false;
 			  }
 
@@ -710,6 +724,9 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 
 			  dynamic_cast<LeaderAgent*>(pSecondLeader_temp)->OnMoving();
 			  m_Vehicles.insert(m_Vehicles.begin() + 1, pSecondLeader_temp);
+			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->EmptyTargetList();
+			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->AddTarget(m_Vehicles[0]);
+			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->AddTarget(m_Vehicles[1]);
 			  m_bOneLeader = false;
 		  }
 		  if (RenderHumanLeader())
@@ -720,6 +737,9 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 			  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetFive);
 			  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTen);
 			  m_Vehicles.insert(m_Vehicles.begin() + 1, pSecondLeader_temp);
+			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->EmptyTargetList();
+			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->AddTarget(m_Vehicles[0]);
+			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->AddTarget(m_Vehicles[1]);
 			  m_bHumanLeader = false;
 		  }
 		  	 
@@ -742,7 +762,8 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 			  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetTwo);
 			  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetFive);
 			  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetTen);
-
+			  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
+			  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
 			  m_bOneLeader = false;
 		  }
 		  if (RenderTwoLeader())
@@ -753,7 +774,8 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 			  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetTwo);
 			  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetFive);
 			  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetTen);
-
+			  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
+			  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
 			  m_bTwoLeader = false;
 		  }
 	  }

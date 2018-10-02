@@ -109,7 +109,7 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
     
     break;
 
-    case WM_KEYUP:
+    case WM_KEYDOWN:
       {
         switch(wParam)
         {
