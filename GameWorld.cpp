@@ -220,27 +220,7 @@ void GameWorld::Update(double time_elapsed)
   
 
   //update the vehicles
-  for (unsigned int a=0; a<m_Vehicles.size(); ++a)
-  {
-	if (a == 2 && typeid(*m_Vehicles[1]).name() == "LeaderAgent") {
-		Vector2D followAgentPos = m_Vehicles[a]->Pos();
-		Vector2D leader1Pos = m_Vehicles[0]->Pos();
-		Vector2D leader2Pos = m_Vehicles[1]->Pos();
-		float dist1 = followAgentPos.Distance(leader1Pos);
-		float dist2 = followAgentPos.Distance(leader2Pos);
-		if (dist1 < dist2)
-		{
-			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OffPursuit();
-			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OnPursuit(m_Vehicles[0], *offset);
-		}
-		else
-		{
-			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OffPursuit();
-			dynamic_cast<FollowAgent*>(m_Vehicles[a])->OnPursuit(m_Vehicles[1], *offset);
-		}
-	}
-	m_Vehicles[a]->Update(time_elapsed);
-  }
+  for (unsigned int a=0; a<m_Vehicles.size(); ++a) { m_Vehicles[a]->Update(time_elapsed); }
 }
   
 
@@ -418,62 +398,70 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
         break;
 
 	case 'Z':
-		humanSpeed += 100;
-		Target = m_Vehicles[0]->Velocity();
-		Target.Normalize();
-		Target = Target * humanSpeed;
-		m_Vehicles[0]->SetVelocity(Target);
-		m_Vehicles[0]->Update(0.001);
-		break;
-	
-	case 'S':
-		if (humanSpeed > 100) {
-			humanSpeed -= 100;
+		if (RenderHumanLeader()) {
+			humanSpeed += 100;
+			Target = m_Vehicles[0]->Velocity();
+			Target.Normalize();
+			Target = Target * humanSpeed;
+			m_Vehicles[0]->SetVelocity(Target);
+			m_Vehicles[0]->Update(0.001);
+			break;
 		}
-		Target = m_Vehicles[0]->Velocity();
-		Target.Normalize();
-		Target = Target * humanSpeed;
-		m_Vehicles[0]->SetVelocity(Target);
-		m_Vehicles[0]->Update(0.001);
-		break;
+
+	case 'S':
+		if (RenderHumanLeader()) {
+			if (humanSpeed > 100) {
+				humanSpeed -= 100;
+			}
+			Target = m_Vehicles[0]->Velocity();
+			Target.Normalize();
+			Target = Target * humanSpeed;
+			m_Vehicles[0]->SetVelocity(Target);
+			m_Vehicles[0]->Update(0.001);
+			break;
+		}
 
 	case 'D':
-		Target = m_Vehicles[0]->Velocity();
-		Target.Normalize();
-		angle = atan(Target.y/Target.x);
-		if (Target.x < 0) {
-			angle += Pi;
+		if (RenderHumanLeader()) {
+			Target = m_Vehicles[0]->Velocity();
+			Target.Normalize();
+			angle = atan(Target.y / Target.x);
+			if (Target.x < 0) {
+				angle += Pi;
+			}
+			else if (Target.y < 0) {
+				angle += 2 * Pi;
+			}
+			angle = angle * (180.0 / Pi);
+			angle += 7;
+			angle = angle * (Pi / 180.0);
+			Target.x = humanSpeed * cos(angle);
+			Target.y = humanSpeed * sin(angle);
+			m_Vehicles[0]->SetVelocity(Target);
+			m_Vehicles[0]->Update(0.001);
+			break;
 		}
-		else if (Target.y < 0) {
-			angle += 2 * Pi;
-		}
-		angle = angle * (180.0/Pi);
-		angle += 7;
-		angle = angle * (Pi/180.0);
-		Target.x = humanSpeed * cos(angle);
-		Target.y = humanSpeed * sin(angle);
-		m_Vehicles[0]->SetVelocity(Target);
-		m_Vehicles[0]->Update(0.001);
-		break;
 
 	case 'Q':
-		Target = m_Vehicles[0]->Velocity();
-		Target.Normalize();
-		angle = atan(Target.y / Target.x);
-		if (Target.x < 0) {
-			angle += Pi;
+		if (RenderHumanLeader()) {
+			Target = m_Vehicles[0]->Velocity();
+			Target.Normalize();
+			angle = atan(Target.y / Target.x);
+			if (Target.x < 0) {
+				angle += Pi;
+			}
+			else if (Target.y < 0) {
+				angle += 2 * Pi;
+			}
+			angle = angle * (180.0 / Pi);
+			angle -= 7;
+			angle = angle * (Pi / 180.0);
+			Target.x = humanSpeed * cos(angle);
+			Target.y = humanSpeed * sin(angle);
+			m_Vehicles[0]->SetVelocity(Target);
+			m_Vehicles[0]->Update(0.001);
+			break;
 		}
-		else if (Target.y < 0) {
-			angle += 2 * Pi;
-		}
-		angle = angle * (180.0 / Pi);
-		angle -= 7;
-		angle = angle * (Pi / 180.0);
-		Target.x = humanSpeed * cos(angle);
-		Target.y = humanSpeed * sin(angle);
-		m_Vehicles[0]->SetVelocity(Target);
-		m_Vehicles[0]->Update(0.001);
-		break;
 
   }//end switch
 }
@@ -688,6 +676,9 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 			  if (RenderTwoLeader()) 
 			  {
 				  m_Vehicles.erase(m_Vehicles.begin() + 1);
+				  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTwo);
+				  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetFive);
+				  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTen);
 				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
 				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
 				  m_bTwoLeader = false;
