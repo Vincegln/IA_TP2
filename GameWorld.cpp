@@ -163,26 +163,6 @@ GameWorld::GameWorld(int cx, int cy):
 	//add it to the cell subdivision
 	m_pCellSpace->AddEntity(pVehicle);
   }
-
-
-//#define SHOAL
-//#ifdef SHOAL
-  //m_Vehicles[Prm.NumAgents-1]->Steering()->FlockingOff();
-  //m_Vehicles[Prm.NumAgents-1]->SetScale(Vector2D(10, 10));
-  //m_Vehicles[Prm.NumAgents-1]->Steering()->WanderOn();
-  //m_Vehicles[Prm.NumAgents-1]->SetMaxSpeed(70);
-
-
-   //for (int i=0; i<Prm.NumAgents-1; ++i)
-  //{
-    //m_Vehicles[i]->Steering()->EvadeOn(m_Vehicles[Prm.NumAgents-1]);
-
-  //}
-//#endif
- 
-  //create any obstacles or walls
-  //CreateObstacles();
-  //CreateWalls();
 }
 
 
@@ -667,30 +647,46 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 
 	  break;
 
+	  // If the user click on the 1 Leader sub-menu
 	  case IDA_ONE_LEADER:
 	  {
+			// We unchecked the other submenu and check 1 Leader.
 			  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_CHECKED);
 			  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_UNCHECKED);
 			  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_UNCHECKED);
 
+			  // If the previous mode was 2 Leader.
 			  if (RenderTwoLeader()) 
 			  {
+				  // We erase the second leader
 				  m_Vehicles.erase(m_Vehicles.begin() + 1);
+
+				  // We set the pursuit to the first Leader.
 				  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTwo);
 				  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetFive);
 				  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTen);
+
+				  // We clean the Target List and add only the Leader.
 				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
 				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
+
 				  m_bTwoLeader = false;
 			  }
-
+			  // If the previous mode was Human Leader.
 			  if (RenderHumanLeader())
 			  {
+				  // We erase the human leader
 				  m_Vehicles.erase(m_Vehicles.begin());
+
+				  // We insert the first leader at the beginning of the vector
 				  m_Vehicles.insert(m_Vehicles.begin(), pLeader_temp);
+
+				  // We set the pursuit to the first Leader.
 				  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTwo);
 				  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetFive);
 				  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTen);
+
+				  // We clean the Target List and add only the Leader.
 				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
 				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
 				  m_bHumanLeader = false;
@@ -701,33 +697,46 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 	  }
 
 	  break;
-
+	  // If the user click on the 2 Leader sub-menu
 	  case IDA_TWO_LEADER:
 	  {
+		  // We unchecked the others submenu and check 2 Leader.
 		  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_CHECKED);
 		  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_UNCHECKED);
 
+		  // If the previous mode was 1 Leader
 		  if (RenderOneLeader()) 
 		  {
 			  //determine a random starting position
 			  Vector2D SpawnPos = Vector2D(2.0, 2.0);
 
+			  // Initialize the movement of the seconde leader
 			  dynamic_cast<LeaderAgent*>(pSecondLeader_temp)->OnMoving();
+
+			  // Insert the second vehicle.
 			  m_Vehicles.insert(m_Vehicles.begin() + 1, pSecondLeader_temp);
+
+			  // Add the second leader to the target list
 			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->EmptyTargetList();
 			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->AddTarget(m_Vehicles[0]);
 			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->AddTarget(m_Vehicles[1]);
 			  m_bOneLeader = false;
 		  }
+		  // If the previous mode was Human Leader
 		  if (RenderHumanLeader())
 		  {
+			  // Erase the human Leader
 			  m_Vehicles.erase(m_Vehicles.begin());
+
+			  // Insert the First Leader and the second Leader
 			  m_Vehicles.insert(m_Vehicles.begin(), pLeader_temp);
 			  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTwo);
 			  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetFive);
 			  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTen);
 			  m_Vehicles.insert(m_Vehicles.begin() + 1, pSecondLeader_temp);
+
+			  // Add the 2 leader to target list.
 			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->EmptyTargetList();
 			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->AddTarget(m_Vehicles[0]);
 			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->AddTarget(m_Vehicles[1]);
@@ -740,31 +749,45 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 
 	  break;
 
+	  // If the user click on the human leader sub-menu
 	  case IDA_HUMAN_LEADER:
 	  {
+		  // We unchecked the others submenu and check 2 Leader.
 		  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_CHECKED);
 
+		  // If the previous mode was 1 Leader
 		  if (RenderOneLeader())
 		  {
+			  // Erase the first leader
 			  m_Vehicles.erase(m_Vehicles.begin());
+
+			  // insert the human leader
 			  m_Vehicles.insert(m_Vehicles.begin(), pHumanLeader_temp);
 			  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetTwo);
 			  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetFive);
 			  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetTen);
+
+			  // Add the human leader to target list.
 			  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
 			  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
 			  m_bOneLeader = false;
 		  }
+		  // If the previous mode was Human Leader
 		  if (RenderTwoLeader())
 		  {
+			  // Erase the 2 leaders
 			  m_Vehicles.erase(m_Vehicles.begin());
 			  m_Vehicles.erase(m_Vehicles.begin());
+
+			  // Insert the human leader
 			  m_Vehicles.insert(m_Vehicles.begin(), pHumanLeader_temp);
 			  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetTwo);
 			  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetFive);
 			  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetTen);
+
+			  // Add the human leader to target list
 			  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
 			  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
 			  m_bTwoLeader = false;
@@ -773,12 +796,15 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 	  m_bHumanLeader = true;
       break;
 
+	  // If the user click on the 20 agent sub-menu
 	  case IDN_TWENTY_AGENT:
 	  {
+		  // We unchecked the others submenu and check 20 agent.
 		  ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_CHECKED);
 		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_UNCHECKED);
 
+		  // If the previous mode was 50 Agent
 		  if (RenderFiftyAgent())
 		  {
 			  for (int i = 50; i > 20; i--)
@@ -790,6 +816,8 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 			  m_bFiftyAgent = false;
 
 		  }
+
+		  // If the previous mode was 100 Agent
 		  if (RenderHundredAgent())
 		  {
 			  for (int i = 100; i > 20; i--)
@@ -804,18 +832,22 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 	  }
 	  break;
 
+	  // If the user click on the 50 agent sub-menu
 	  case IDN_FIFTY_AGENT:
 	  {
+		  // We unchecked the others submenu and check 50 agent.
 		  ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_CHECKED);
 		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_UNCHECKED);
 
+		  // If the previous mode was 20 Agent
 		  if (RenderTwentyAgent())
 		  {
 			  for (int i = 0; i < 30; i++) 
 			  {
 				  Vector2D SpawnPos = Vector2D(2.0, 2.0);
 
+				  // We create new Agents
 				  Vehicle* pVehicle = new FollowAgent(this,
 					  SpawnPos,                 //initial position
 					  RandFloat()*TwoPi,        //start rotation
@@ -831,6 +863,7 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 				  if (RenderTenOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()-1], *offset = *offsetTen);
 				  m_Vehicles.push_back(pVehicle);
 
+				  // We re-activated WeightedSum for the new Agent
 				  if (RenderWeightedSum())
 				  {
 					  for (unsigned int i = 0; i < m_Vehicles.size(); ++i)
@@ -843,6 +876,8 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 			  }
 			  m_bTwentyAgent = false;
 		  }
+
+		  // If the previous mode was 100 Agent
 		  if (RenderHundredAgent())
 		  {
 			  for (int i = 100; i > 50; i--)
@@ -857,18 +892,22 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 	  }
 	  break;
 
+	  // If the user click on the 100 agent sub-menu
 	  case IDN_HUNDRED_AGENT:
 	  {
+		  // We unchecked the others submenu and check 100 agent.
 		  ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_CHECKED);
 
+		  // If the previous mode was 20 Agent
 		  if (RenderTwentyAgent())
 		  {
 			  for (int i = 0; i < 100; i++)
 			  {
 				  Vector2D SpawnPos = Vector2D(2.0, 2.0);
 
+				  // We create new Agents
 				  Vehicle* pVehicle = new FollowAgent(this,
 					  SpawnPos,                 //initial position
 					  RandFloat()*TwoPi,        //start rotation
@@ -884,6 +923,7 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 				  if (RenderTenOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()-1], *offset = *offsetTen);
 				  m_Vehicles.push_back(pVehicle);
 
+				  // We re-activated WeightedSum for the new Agent
 				  if (RenderWeightedSum())
 				  {
 					  for (unsigned int i = 0; i < m_Vehicles.size(); ++i)
@@ -896,12 +936,14 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 			  m_bTwentyAgent = false;
 		  }
 
+		  // If the previous mode was 50 Agent
 		  if (RenderFiftyAgent())
 		  {
 			  for (int i = 0; i < 50; i++)
 			  {
 				  Vector2D SpawnPos = Vector2D(2.0, 2.0);
 
+				  // We create new Agents
 				  Vehicle* pVehicle = new FollowAgent(this,
 					  SpawnPos,                 //initial position
 					  RandFloat()*TwoPi,        //start rotation
@@ -917,6 +959,7 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 				  if (RenderTenOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()-1], *offset = *offsetTen);
 				  m_Vehicles.push_back(pVehicle);
 
+				  // We re-activated WeightedSum for the new Agent
 				  if (RenderWeightedSum())
 				  {
 					  for (unsigned int i = 0; i < m_Vehicles.size(); ++i)
@@ -934,12 +977,15 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 	  }
 	  break;
 
+	  // If the user click on the 2 offset sub-menu
 	  case IDO_TWO_OFFSET:
 	  {
+		  // We unchecked the others submenu and check 2 offset.
 		  ChangeMenuState(hwnd, IDO_TWO_OFFSET, MFS_CHECKED);
 		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_UNCHECKED);
 
+		  // We test if we have 20,50 or 100 Agents and we change the offset of all the agents
 			  if (RenderTwentyAgent())
 			  {
 				  for (int i = 1; i < 20; i++)
@@ -1005,12 +1051,15 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 
 	  break;
 
+	  // If the user click on the 5 offset sub-menu
 	  case IDO_FIVE_OFFSET:
 	  {
+		  // We unchecked the others submenu and check 5 offset.
 		  ChangeMenuState(hwnd, IDO_TWO_OFFSET, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_CHECKED);
 		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_UNCHECKED);
 
+		  // We test if we have 20,50 or 100 Agents and we change the offset of all the agents
 		  if (RenderTwentyAgent())
 		  {
 			  for (int i = 1; i < 20; i++)
@@ -1073,13 +1122,15 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
 	  }
 
 	  break;
-
+	  // If the user click on the 10 offset sub-menu
 	  case IDO_TEN_OFFSET:
 	  {
+		  // We unchecked the others submenu and check 10 offset.
 		  ChangeMenuState(hwnd, IDO_TWO_OFFSET, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_UNCHECKED);
 		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_CHECKED);
 
+		  // We test if we have 20,50 or 100 Agents and we change the offset of all the agents
 		  if (RenderTwentyAgent())
 		  {
 			  for (int i = 1; i < 20; i++)
