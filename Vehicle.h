@@ -58,6 +58,7 @@ private:
 
 public:
 
+
   Vehicle(GameWorld* world,
          Vector2D position,
          double    rotation,
@@ -71,7 +72,7 @@ public:
   ~Vehicle();
 
   //updates the vehicle's position and orientation
-  void        Update(double time_elapsed);
+  virtual void        Update(double time_elapsed);
 
   void        Render();
 

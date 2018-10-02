@@ -16,7 +16,7 @@
 //
 //------------------------------------------------------------------------
 
-char* g_szApplicationName = "Steering Behaviors - Another Big Shoal";
+char* g_szApplicationName = "IA TP 2 LeaderAgent and HumanLeader";
 char*	g_szWindowClassName = "MyWindowClass";
 
 GameWorld* g_GameWorld;
@@ -83,8 +83,12 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
          
          g_GameWorld = new GameWorld(cxClient, cyClient);
 
-         ChangeMenuState(hwnd, IDR_PRIORITIZED, MFS_CHECKED);
+		 // Check the items that are already set up 
+         ChangeMenuState(hwnd, IDR_WEIGHTED_SUM, MFS_CHECKED);
          ChangeMenuState(hwnd, ID_VIEW_FPS, MFS_CHECKED);
+		 ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_CHECKED);
+		 ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_CHECKED);
+		 ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_CHECKED);
          
       }
 
@@ -105,7 +109,7 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
     
     break;
 
-    case WM_KEYUP:
+    case WM_KEYDOWN:
       {
         switch(wParam)
         {

@@ -1,5 +1,8 @@
 #include "GameWorld.h"
 #include "Vehicle.h"
+#include "FollowAgent.h"
+#include "LeaderAgent.h"
+#include "HumanLeader.h"
 #include "constants.h"
 #include "Obstacle.h"
 #include "2d/Geometry.h"
@@ -11,12 +14,23 @@
 #include "ParamLoader.h"
 #include "misc/WindowUtils.h"
 #include "misc/Stream_Utility_Functions.h"
-
-
+#include <iostream>
 #include "resource.h"
 
 #include <list>
 using std::list;
+using namespace std;
+
+// Creation of the two LeaderAgent and HumanAgent
+Vehicle* pLeader_temp;
+Vehicle* pSecondLeader_temp;
+Vehicle* pHumanLeader_temp;
+Vehicle* pFollow_Temp;
+static Vector2D* offsetTwo = new Vector2D(2, 2);
+static Vector2D* offsetFive = new Vector2D(5, 5);
+static Vector2D* offsetTen = new Vector2D(10.0, 10.0);
+Vector2D* offset = offsetTen;
+
 
 
 //------------------------------- ctor -----------------------------------
@@ -39,7 +53,18 @@ GameWorld::GameWorld(int cx, int cy):
             m_pPath(NULL),
             m_bRenderNeighbors(false),
             m_bViewKeys(false),
-            m_bShowCellSpaceInfo(false)
+            m_bShowCellSpaceInfo(false),
+			m_bHumanLeader(false),
+			m_bOneLeader(true),
+			m_bTwoLeader(false),
+			m_bTwoOffset(false),
+			m_bFiveOffset(true),
+			m_bTenOffset(false),
+			m_bTwentyAgent(true),
+			m_bFiftyAgent(false),
+			m_bHundredAgent(false),
+			m_bWeightedSum(false),
+			humanSpeed(100)
 {
 
   //setup the spatial subdivision class
@@ -48,48 +73,112 @@ GameWorld::GameWorld(int cx, int cy):
   double border = 30;
   m_pPath = new Path(5, border, border, cx-border, cy-border, true); 
 
+  //determine a random starting position
+  Vector2D SpawnPos = Vector2D(cx / 2.0 + RandomClamped()*cx / 2.0,
+	  cy / 2.0 + RandomClamped()*cy / 2.0);
+
+  // Creation of the first LeaderAgent
+  Vehicle* pLeader = new LeaderAgent(this,
+	  SpawnPos,                 //initial position
+	  RandFloat()*TwoPi,        //start rotation
+	  Vector2D(100, 100),            //velocity
+	  Prm.VehicleMass,          //mass
+	  Prm.MaxSteeringForce,     //max force
+	  Prm.MaxSpeed,             //max velocity
+	  Prm.MaxTurnRatePerSecond, //max turn rate
+	  Prm.VehicleScale);        //scale
+
+  // We initialize a pointer that will help to refer to the First Leader.
+  pLeader_temp = pLeader;
+
+  // We give the movement to the first leader.
+  dynamic_cast<LeaderAgent*>(pLeader)->OnMoving();
+  // We put it onto the list of Vehicles on the screen
+  m_Vehicles.push_back(pLeader);
+
+  // Creation of the second LeaderAgent
+  Vehicle* pSecondLeader = new LeaderAgent(this,
+	  SpawnPos,                 //initial position
+	  RandFloat()*TwoPi,        //start rotation
+	  Vector2D(0, 0),            //velocity
+	  Prm.VehicleMass,          //mass
+	  Prm.MaxSteeringForce,     //max force
+	  Prm.MaxSpeed,             //max velocity
+	  Prm.MaxTurnRatePerSecond, //max turn rate
+	  Prm.VehicleScale);        //scale
+
+  // We initialize a pointer that will help to refer to the Second Leader.
+  pSecondLeader_temp = pSecondLeader;
+
+  // We give the movement to the second leader.
+  dynamic_cast<LeaderAgent*>(pLeader)->OnMoving();
+
+  // Creation of the HumanLeader
+
+  Vehicle* pHumanLeader = new HumanLeader(this,
+	  SpawnPos,                 //initial position
+	  RandFloat()*TwoPi,        //start rotation
+	  Vector2D(100, 100),            //velocity
+	  Prm.VehicleMass,          //mass
+	  Prm.MaxSteeringForce,     //max force
+	  Prm.MaxSpeed,             //max velocity
+	  Prm.MaxTurnRatePerSecond, //max turn rate
+	  Prm.VehicleScale);        //scale
+
+  // We initialize a pointer that will help to refer to the Human Leader.
+  pHumanLeader_temp = pHumanLeader;
+  
+  // We initialize a pointer that will help to build the follow Agents.
+  Vehicle* pVehicleTemp = pLeader;
+
   //setup the agents
   for (int a=0; a<Prm.NumAgents; ++a)
   {
+	  //determine a random starting position
+	Vector2D SpawnPos = Vector2D(cx / 2.0 + RandomClamped()*cx / 2.0,
+								cy / 2.0 + RandomClamped()*cy / 2.0);
 
-    //determine a random starting position
-    Vector2D SpawnPos = Vector2D(cx/2.0+RandomClamped()*cx/2.0,
-                                 cy/2.0+RandomClamped()*cy/2.0);
+	// If it's the firts FollowAgent, he follows the LeaderAgent
+	  
+	Vehicle* pVehicle = new FollowAgent(this,
+		SpawnPos,                 //initial position
+		RandFloat()*TwoPi,        //start rotation
+		Vector2D(0, 0),            //velocity
+		Prm.VehicleMass,          //mass
+		Prm.MaxSteeringForce,     //max force
+		Prm.MaxSpeed,             //max velocity
+		Prm.MaxTurnRatePerSecond, //max turn rate
+		Prm.VehicleScale);        //scale
 
+	// All the follow Agent follows the Vehicle above him in the list.
+	dynamic_cast<FollowAgent*>(pVehicle)->OnPursuit(pVehicleTemp, *offsetFive);
+	dynamic_cast<FollowAgent*>(pVehicle)->AddTarget(pVehicleTemp);
 
-    Vehicle* pVehicle = new Vehicle(this,
-                                    SpawnPos,                 //initial position
-                                    RandFloat()*TwoPi,        //start rotation
-                                    Vector2D(0,0),            //velocity
-                                    Prm.VehicleMass,          //mass
-                                    Prm.MaxSteeringForce,     //max force
-                                    Prm.MaxSpeed,             //max velocity
-                                    Prm.MaxTurnRatePerSecond, //max turn rate
-                                    Prm.VehicleScale);        //scale
+	// We change the pointer for the new Follow Agent
+	pVehicleTemp = pVehicle;
 
-    pVehicle->Steering()->FlockingOn();
+	// We put it onto the list of Vehicles on the screen
+	m_Vehicles.push_back(pVehicle);
 
-    m_Vehicles.push_back(pVehicle);
-
-    //add it to the cell subdivision
-    m_pCellSpace->AddEntity(pVehicle);
+	//add it to the cell subdivision
+	m_pCellSpace->AddEntity(pVehicle);
   }
 
 
-#define SHOAL
-#ifdef SHOAL
-  m_Vehicles[Prm.NumAgents-1]->Steering()->FlockingOff();
-  m_Vehicles[Prm.NumAgents-1]->SetScale(Vector2D(10, 10));
-  m_Vehicles[Prm.NumAgents-1]->Steering()->WanderOn();
-  m_Vehicles[Prm.NumAgents-1]->SetMaxSpeed(70);
+//#define SHOAL
+//#ifdef SHOAL
+  //m_Vehicles[Prm.NumAgents-1]->Steering()->FlockingOff();
+  //m_Vehicles[Prm.NumAgents-1]->SetScale(Vector2D(10, 10));
+  //m_Vehicles[Prm.NumAgents-1]->Steering()->WanderOn();
+  //m_Vehicles[Prm.NumAgents-1]->SetMaxSpeed(70);
 
 
-   for (int i=0; i<Prm.NumAgents-1; ++i)
-  {
-    m_Vehicles[i]->Steering()->EvadeOn(m_Vehicles[Prm.NumAgents-1]);
+   //for (int i=0; i<Prm.NumAgents-1; ++i)
+  //{
+    //m_Vehicles[i]->Steering()->EvadeOn(m_Vehicles[Prm.NumAgents-1]);
 
-  }
-#endif
+  //}
+//#endif
  
   //create any obstacles or walls
   //CreateObstacles();
@@ -131,10 +220,7 @@ void GameWorld::Update(double time_elapsed)
   
 
   //update the vehicles
-  for (unsigned int a=0; a<m_Vehicles.size(); ++a)
-  {
-    m_Vehicles[a]->Update(time_elapsed);
-  }
+  for (unsigned int a=0; a<m_Vehicles.size(); ++a) { m_Vehicles[a]->Update(time_elapsed); }
 }
   
 
@@ -249,6 +335,8 @@ void GameWorld::SetCrosshair(POINTS p)
 //------------------------- HandleKeyPresses -----------------------------
 void GameWorld::HandleKeyPresses(WPARAM wParam)
 {
+	Vector2D Target;
+	double angle;
 
   switch(wParam)
   {
@@ -308,6 +396,72 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
           }
         }
         break;
+
+	case 'Z':
+		if (RenderHumanLeader()) {
+			humanSpeed += 100;
+			Target = m_Vehicles[0]->Velocity();
+			Target.Normalize();
+			Target = Target * humanSpeed;
+			m_Vehicles[0]->SetVelocity(Target);
+			m_Vehicles[0]->Update(0.001);
+			break;
+		}
+
+	case 'S':
+		if (RenderHumanLeader()) {
+			if (humanSpeed > 100) {
+				humanSpeed -= 100;
+			}
+			Target = m_Vehicles[0]->Velocity();
+			Target.Normalize();
+			Target = Target * humanSpeed;
+			m_Vehicles[0]->SetVelocity(Target);
+			m_Vehicles[0]->Update(0.001);
+			break;
+		}
+
+	case 'D':
+		if (RenderHumanLeader()) {
+			Target = m_Vehicles[0]->Velocity();
+			Target.Normalize();
+			angle = atan(Target.y / Target.x);
+			if (Target.x < 0) {
+				angle += Pi;
+			}
+			else if (Target.y < 0) {
+				angle += 2 * Pi;
+			}
+			angle = angle * (180.0 / Pi);
+			angle += 7;
+			angle = angle * (Pi / 180.0);
+			Target.x = humanSpeed * cos(angle);
+			Target.y = humanSpeed * sin(angle);
+			m_Vehicles[0]->SetVelocity(Target);
+			m_Vehicles[0]->Update(0.001);
+			break;
+		}
+
+	case 'Q':
+		if (RenderHumanLeader()) {
+			Target = m_Vehicles[0]->Velocity();
+			Target.Normalize();
+			angle = atan(Target.y / Target.x);
+			if (Target.x < 0) {
+				angle += Pi;
+			}
+			else if (Target.y < 0) {
+				angle += 2 * Pi;
+			}
+			angle = angle * (180.0 / Pi);
+			angle -= 7;
+			angle = angle * (Pi / 180.0);
+			Target.x = humanSpeed * cos(angle);
+			Target.y = humanSpeed * sin(angle);
+			m_Vehicles[0]->SetVelocity(Target);
+			m_Vehicles[0]->Update(0.001);
+			break;
+		}
 
   }//end switch
 }
@@ -445,6 +599,7 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
         {
           m_Vehicles[i]->Steering()->SetSummingMethod(SteeringBehavior::weighted_average);
         }
+		m_bWeightedSum = true;
       }
 
       break;
@@ -459,6 +614,8 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
         {
           m_Vehicles[i]->Steering()->SetSummingMethod(SteeringBehavior::prioritized);
         }
+
+		m_bWeightedSum = false;
       }
 
       break;
@@ -473,6 +630,8 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
         {
           m_Vehicles[i]->Steering()->SetSummingMethod(SteeringBehavior::dithered);
         }
+
+		m_bWeightedSum = false;
       }
 
       break;
@@ -506,8 +665,484 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
         CheckMenuItemAppropriately(hwnd, ID_MENU_SMOOTHING, m_Vehicles[0]->isSmoothingOn());
       }
 
+	  break;
+
+	  case IDA_ONE_LEADER:
+	  {
+			  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_CHECKED);
+			  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_UNCHECKED);
+			  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_UNCHECKED);
+
+			  if (RenderTwoLeader()) 
+			  {
+				  m_Vehicles.erase(m_Vehicles.begin() + 1);
+				  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTwo);
+				  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetFive);
+				  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTen);
+				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
+				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
+				  m_bTwoLeader = false;
+			  }
+
+			  if (RenderHumanLeader())
+			  {
+				  m_Vehicles.erase(m_Vehicles.begin());
+				  m_Vehicles.insert(m_Vehicles.begin(), pLeader_temp);
+				  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTwo);
+				  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetFive);
+				  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTen);
+				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
+				  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
+				  m_bHumanLeader = false;
+			  }
+
+			  m_bOneLeader = true;
+
+	  }
+
+	  break;
+
+	  case IDA_TWO_LEADER:
+	  {
+		  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_UNCHECKED);
+
+		  if (RenderOneLeader()) 
+		  {
+			  //determine a random starting position
+			  Vector2D SpawnPos = Vector2D(2.0, 2.0);
+
+			  dynamic_cast<LeaderAgent*>(pSecondLeader_temp)->OnMoving();
+			  m_Vehicles.insert(m_Vehicles.begin() + 1, pSecondLeader_temp);
+			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->EmptyTargetList();
+			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->AddTarget(m_Vehicles[0]);
+			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->AddTarget(m_Vehicles[1]);
+			  m_bOneLeader = false;
+		  }
+		  if (RenderHumanLeader())
+		  {
+			  m_Vehicles.erase(m_Vehicles.begin());
+			  m_Vehicles.insert(m_Vehicles.begin(), pLeader_temp);
+			  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTwo);
+			  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetFive);
+			  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pLeader_temp, *offset = *offsetTen);
+			  m_Vehicles.insert(m_Vehicles.begin() + 1, pSecondLeader_temp);
+			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->EmptyTargetList();
+			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->AddTarget(m_Vehicles[0]);
+			  dynamic_cast<FollowAgent*>(m_Vehicles[2])->AddTarget(m_Vehicles[1]);
+			  m_bHumanLeader = false;
+		  }
+		  	 
+
+		  m_bTwoLeader = true;
+	  }
+
+	  break;
+
+	  case IDA_HUMAN_LEADER:
+	  {
+		  ChangeMenuState(hwnd, IDA_ONE_LEADER, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDA_TWO_LEADER, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDA_HUMAN_LEADER, MFS_CHECKED);
+
+		  if (RenderOneLeader())
+		  {
+			  m_Vehicles.erase(m_Vehicles.begin());
+			  m_Vehicles.insert(m_Vehicles.begin(), pHumanLeader_temp);
+			  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetTwo);
+			  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetFive);
+			  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetTen);
+			  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
+			  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
+			  m_bOneLeader = false;
+		  }
+		  if (RenderTwoLeader())
+		  {
+			  m_Vehicles.erase(m_Vehicles.begin());
+			  m_Vehicles.erase(m_Vehicles.begin());
+			  m_Vehicles.insert(m_Vehicles.begin(), pHumanLeader_temp);
+			  if (RenderTwoOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetTwo);
+			  if (RenderFiveOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetFive);
+			  if (RenderTenOffset()) m_Vehicles[1]->Steering()->OffsetPursuitOn(pHumanLeader_temp, *offset = *offsetTen);
+			  dynamic_cast<FollowAgent*>(m_Vehicles[1])->EmptyTargetList();
+			  dynamic_cast<FollowAgent*>(m_Vehicles[1])->AddTarget(m_Vehicles[0]);
+			  m_bTwoLeader = false;
+		  }
+	  }
+	  m_bHumanLeader = true;
       break;
-      
+
+	  case IDN_TWENTY_AGENT:
+	  {
+		  ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_UNCHECKED);
+
+		  if (RenderFiftyAgent())
+		  {
+			  for (int i = 50; i > 20; i--)
+			  {
+				  
+				  m_Vehicles[i]->Steering()->OffsetPursuitOff();
+				  m_Vehicles.erase(m_Vehicles.begin() + i);
+			  }
+			  m_bFiftyAgent = false;
+
+		  }
+		  if (RenderHundredAgent())
+		  {
+			  for (int i = 100; i > 20; i--)
+			  {
+				  m_Vehicles[i]->Steering()->OffsetPursuitOff();
+				  m_Vehicles.erase(m_Vehicles.begin() + i);
+			  }
+			  m_bHundredAgent = false;
+		  }
+
+		  m_bTwentyAgent = true;
+	  }
+	  break;
+
+	  case IDN_FIFTY_AGENT:
+	  {
+		  ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_UNCHECKED);
+
+		  if (RenderTwentyAgent())
+		  {
+			  for (int i = 0; i < 30; i++) 
+			  {
+				  Vector2D SpawnPos = Vector2D(2.0, 2.0);
+
+				  Vehicle* pVehicle = new FollowAgent(this,
+					  SpawnPos,                 //initial position
+					  RandFloat()*TwoPi,        //start rotation
+					  Vector2D(0, 0),            //velocity
+					  Prm.VehicleMass,          //mass
+					  Prm.MaxSteeringForce,     //max force
+					  Prm.MaxSpeed,             //max velocity
+					  Prm.MaxTurnRatePerSecond, //max turn rate
+					  Prm.VehicleScale);        //scale
+
+				  if (RenderTwoOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()-1], *offset = *offsetTwo);
+				  if (RenderFiveOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()-1], *offset = *offsetFive);
+				  if (RenderTenOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()-1], *offset = *offsetTen);
+				  m_Vehicles.push_back(pVehicle);
+
+				  if (RenderWeightedSum())
+				  {
+					  for (unsigned int i = 0; i < m_Vehicles.size(); ++i)
+					  {
+						  m_Vehicles[i]->Steering()->SetSummingMethod(SteeringBehavior::weighted_average);
+					  }
+				  }
+
+				 
+			  }
+			  m_bTwentyAgent = false;
+		  }
+		  if (RenderHundredAgent())
+		  {
+			  for (int i = 100; i > 50; i--)
+			  {
+				  pFollow_Temp = m_Vehicles[i];
+				  m_Vehicles.erase(m_Vehicles.begin() + i);
+			  }
+			  m_bHundredAgent = false;
+		  }
+
+		  m_bFiftyAgent = true;
+	  }
+	  break;
+
+	  case IDN_HUNDRED_AGENT:
+	  {
+		  ChangeMenuState(hwnd, IDN_TWENTY_AGENT, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDN_FIFTY_AGENT, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDN_HUNDRED_AGENT, MFS_CHECKED);
+
+		  if (RenderTwentyAgent())
+		  {
+			  for (int i = 0; i < 100; i++)
+			  {
+				  Vector2D SpawnPos = Vector2D(2.0, 2.0);
+
+				  Vehicle* pVehicle = new FollowAgent(this,
+					  SpawnPos,                 //initial position
+					  RandFloat()*TwoPi,        //start rotation
+					  Vector2D(0, 0),            //velocity
+					  Prm.VehicleMass,          //mass
+					  Prm.MaxSteeringForce,     //max force
+					  Prm.MaxSpeed,             //max velocity
+					  Prm.MaxTurnRatePerSecond, //max turn rate
+					  Prm.VehicleScale);        //scale
+
+				  if (RenderTwoOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()-1], *offset = *offsetTwo);
+				  if (RenderFiveOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()-1], *offset = *offsetFive);
+				  if (RenderTenOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()-1], *offset = *offsetTen);
+				  m_Vehicles.push_back(pVehicle);
+
+				  if (RenderWeightedSum())
+				  {
+					  for (unsigned int i = 0; i < m_Vehicles.size(); ++i)
+					  {
+						  m_Vehicles[i]->Steering()->SetSummingMethod(SteeringBehavior::weighted_average);
+					  }
+				  }
+
+			  }
+			  m_bTwentyAgent = false;
+		  }
+
+		  if (RenderFiftyAgent())
+		  {
+			  for (int i = 0; i < 50; i++)
+			  {
+				  Vector2D SpawnPos = Vector2D(2.0, 2.0);
+
+				  Vehicle* pVehicle = new FollowAgent(this,
+					  SpawnPos,                 //initial position
+					  RandFloat()*TwoPi,        //start rotation
+					  Vector2D(0, 0),            //velocity
+					  Prm.VehicleMass,          //mass
+					  Prm.MaxSteeringForce,     //max force
+					  Prm.MaxSpeed,             //max velocity
+					  Prm.MaxTurnRatePerSecond, //max turn rate
+					  Prm.VehicleScale);        //scale
+
+				  if (RenderTwoOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()-1], *offset = *offsetTwo);
+				  if (RenderFiveOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()-1], *offset = *offsetFive);
+				  if (RenderTenOffset()) pVehicle->Steering()->OffsetPursuitOn(m_Vehicles[m_Vehicles.size()-1], *offset = *offsetTen);
+				  m_Vehicles.push_back(pVehicle);
+
+				  if (RenderWeightedSum())
+				  {
+					  for (unsigned int i = 0; i < m_Vehicles.size(); ++i)
+					  {
+						  m_Vehicles[i]->Steering()->SetSummingMethod(SteeringBehavior::weighted_average);
+					  }
+				  }
+
+
+			  }
+			  m_bFiftyAgent = false;
+		  }
+
+		  m_bHundredAgent = true;
+	  }
+	  break;
+
+	  case IDO_TWO_OFFSET:
+	  {
+		  ChangeMenuState(hwnd, IDO_TWO_OFFSET, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_UNCHECKED);
+
+			  if (RenderTwentyAgent())
+			  {
+				  for (int i = 1; i < 20; i++)
+				  {
+					  if (RenderTwoLeader())
+					  {
+						  if (i != 1)
+						  {
+							  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTwo);
+						  }
+
+					  }
+					  else
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTwo);
+					  }
+				  }
+			  }
+
+			  if (RenderFiftyAgent())
+			  {
+				  for (int i = 1; i < 50; i++)
+				  {
+					  if (RenderTwoLeader())
+					  {
+						  if (i != 1)
+						  {
+							  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTwo);
+						  }
+
+					  }
+					  else
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTwo);
+					  }
+				  }
+			  }
+
+			  if (RenderHundredAgent())
+			  {
+				  for (int i = 1; i < 100; i++)
+				  {
+					  if (RenderTwoLeader())
+					  {
+						  if (i != 1)
+						  {
+							  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTwo);
+						  }
+
+					  }
+					  else
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTwo);
+					  }
+				  }
+			  }
+
+			  m_bFiveOffset = false;
+			  m_bTenOffset = false;
+
+		  m_bTwoOffset = true;
+	  }
+
+	  break;
+
+	  case IDO_FIVE_OFFSET:
+	  {
+		  ChangeMenuState(hwnd, IDO_TWO_OFFSET, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_UNCHECKED);
+
+		  if (RenderTwentyAgent())
+		  {
+			  for (int i = 1; i < 20; i++)
+			  {
+				  if (RenderTwoLeader())
+				  {
+					  if (i != 1)
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetFive);
+					  }
+
+				  }
+				  else
+				  {
+					  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetFive);
+				  }
+			  }
+		  }
+
+		  if (RenderFiftyAgent())
+		  {
+			  for (int i = 1; i < 50; i++)
+			  {
+				  if (RenderTwoLeader())
+				  {
+					  if (i != 1)
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetFive);
+					  }
+
+				  }
+				  else
+				  {
+					  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetFive);
+				  }
+			  }
+		  }
+
+		  if (RenderHundredAgent())
+		  {
+			  for (int i = 1; i < 100; i++)
+			  {
+				  if (RenderTwoLeader())
+				  {
+					  if (i != 1)
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetFive);
+					  }
+
+				  }
+				  else
+				  {
+					  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetFive);
+				  }
+			  }
+		  }
+		  m_bTwoOffset = false;
+		  m_bTenOffset = false;
+		  m_bFiveOffset = true;
+	  }
+
+	  break;
+
+	  case IDO_TEN_OFFSET:
+	  {
+		  ChangeMenuState(hwnd, IDO_TWO_OFFSET, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDO_FIVE_OFFSET, MFS_UNCHECKED);
+		  ChangeMenuState(hwnd, IDO_TEN_OFFSET, MFS_CHECKED);
+
+		  if (RenderTwentyAgent())
+		  {
+			  for (int i = 1; i < 20; i++)
+			  {
+				  if (RenderTwoLeader())
+				  {
+					  if (i != 1)
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTen);
+					  }
+
+				  }
+				  else
+				  {
+					  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTen);
+				  }
+			  }
+		  }
+
+		  if (RenderFiftyAgent())
+		  {
+			  for (int i = 1; i < 50; i++)
+			  {
+				  if (RenderTwoLeader())
+				  {
+					  if (i != 1)
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTen);
+					  }
+
+				  }
+				  else
+				  {
+					  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTen);
+				  }
+			  }
+		  }
+
+		  if (RenderHundredAgent())
+		  {
+			  for (int i = 1; i < 100; i++)
+			  {
+				  if (RenderTwoLeader())
+				  {
+					  if (i != 1)
+					  {
+						  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTen);
+					  }
+
+				  }
+				  else
+				  {
+					  m_Vehicles[i]->Steering()->OffsetPursuitOn(m_Vehicles[i - 1], *offset = *offsetTen);
+				  }
+			  }
+		  }
+		  m_bTwoOffset = false;
+		  m_bFiveOffset = false;
+		  m_bTenOffset = true;
+	  }
+
+	  break;
+
   }//end switch
 }
 
@@ -536,7 +1171,7 @@ void GameWorld::Render()
   //render the agents
   for (unsigned int a=0; a<m_Vehicles.size(); ++a)
   {
-    m_Vehicles[a]->Render();  
+    m_Vehicles[a]->Render(); 
     
     //render cell partitioning stuff
     if (m_bShowCellSpaceInfo && a==0)

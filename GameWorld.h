@@ -10,7 +10,8 @@
 #include "misc/CellSpacePartition.h"
 #include "BaseGameEntity.h"
 #include "EntityFunctionTemplates.h"
-#include "vehicle.h"
+#include "Vehicle.h"
+#include "FollowAgent.h"
 
 
 class Obstacle;
@@ -51,7 +52,8 @@ private:
   //keeps track of the average FPS
   double                         m_dAvFrameTime;
 
-
+  // Constant velocity for the human leader
+  double						humanSpeed;
   //flags to turn aids and obstacles etc on/off
   bool  m_bShowWalls;
   bool  m_bShowObstacles;
@@ -64,7 +66,17 @@ private:
   bool  m_bRenderNeighbors;
   bool  m_bViewKeys;
   bool  m_bShowCellSpaceInfo;
-
+  bool  m_bHumanLeader;
+  bool  m_bOneLeader;
+  bool  m_bTwoLeader;
+  bool  m_bTwentyAgent;
+  bool  m_bFiftyAgent;
+  bool  m_bHundredAgent;
+  bool  m_bTwoOffset;
+  bool  m_bFiveOffset;
+  bool  m_bTenOffset;
+  bool  m_bWeightedSum;
+  
 
   void CreateObstacles();
 
@@ -123,6 +135,18 @@ public:
   bool  RenderFeelers()const{return m_bShowFeelers;}
   bool  RenderSteeringForce()const{return m_bShowSteeringForce;}
 
+  bool  RenderHumanLeader()const { return m_bHumanLeader; }
+  bool  RenderOneLeader()const { return m_bOneLeader; }
+  bool  RenderTwoLeader()const { return m_bTwoLeader; }
+
+  bool RenderTwentyAgent() const { return m_bTwentyAgent; }
+  bool RenderFiftyAgent() const { return m_bFiftyAgent; }
+  bool RenderHundredAgent() const { return m_bHundredAgent; }
+
+  bool RenderTwoOffset() const { return m_bTwoOffset; }
+  bool RenderFiveOffset() const { return m_bFiveOffset; }
+  bool RenderTenOffset() const { return m_bTenOffset; }
+
   bool  RenderFPS()const{return m_bShowFPS;}
   void  ToggleShowFPS(){m_bShowFPS = !m_bShowFPS;}
   
@@ -131,6 +155,8 @@ public:
   
   void  ToggleViewKeys(){m_bViewKeys = !m_bViewKeys;}
   bool  ViewKeys()const{return m_bViewKeys;}
+
+  bool RenderWeightedSum()const { return m_bWeightedSum; }
 
 };
 

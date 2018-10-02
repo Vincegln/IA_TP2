@@ -39,19 +39,28 @@
     <ClCompile Include="Path.cpp">
       <Filter>misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Repo%27s\IA for Games\IA_TP2\2D\Vector2d.cpp">
+    <ClCompile Include="Time\PrecisionTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Repo%27s\IA for Games\IA_TP2\misc\Cgdi.cpp">
+    <ClCompile Include="misc\WindowUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Repo%27s\IA for Games\IA_TP2\misc\iniFileLoaderBase.cpp">
+    <ClCompile Include="misc\iniFileLoaderBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Repo%27s\IA for Games\IA_TP2\misc\WindowUtils.cpp">
+    <ClCompile Include="misc\Cgdi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Repo%27s\IA for Games\IA_TP2\Time\PrecisionTimer.cpp">
+    <ClCompile Include="2D\Vector2d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FollowAgent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LeaderAgent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HumanLeader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,46 +98,55 @@
     <ClInclude Include="Path.h">
       <Filter>misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\2D\C2DMatrix.h">
+    <ClInclude Include="FollowAgent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\2D\geometry.h">
+    <ClInclude Include="2D\C2DMatrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\2D\InvertedAABBox2D.h">
+    <ClInclude Include="misc\CellSpacePartition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\2D\Transformations.h">
+    <ClInclude Include="misc\Cgdi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\2D\Vector2D.h">
+    <ClInclude Include="2D\geometry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\2D\Wall2D.h">
+    <ClInclude Include="misc\iniFileLoaderBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\misc\CellSpacePartition.h">
+    <ClInclude Include="2D\InvertedAABBox2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\misc\Cgdi.h">
+    <ClInclude Include="Time\PrecisionTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\misc\iniFileLoaderBase.h">
+    <ClInclude Include="misc\Smoother.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\misc\Smoother.h">
+    <ClInclude Include="misc\Stream_Utility_Functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\misc\Stream_Utility_Functions.h">
+    <ClInclude Include="2D\Transformations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\misc\utils.h">
+    <ClInclude Include="misc\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\misc\WindowUtils.h">
+    <ClInclude Include="2D\Vector2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Repo%27s\IA for Games\IA_TP2\Time\PrecisionTimer.h">
+    <ClInclude Include="2D\Wall2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misc\WindowUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LeaderAgent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HumanLeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

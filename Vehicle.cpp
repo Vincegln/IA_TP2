@@ -11,6 +11,7 @@ using std::vector;
 using std::list;
 
 
+
 //----------------------------- ctor -------------------------------------
 //------------------------------------------------------------------------
 Vehicle::Vehicle(GameWorld* world,
@@ -52,7 +53,7 @@ Vehicle::Vehicle(GameWorld* world,
 //-----------------------------------------------------------------------
 Vehicle::~Vehicle()
 {
-  delete m_pSteering;
+  //delete m_pSteering;
   delete m_pHeadingSmoother;
 }
 
@@ -121,18 +122,30 @@ void Vehicle::Render()
   //a vector to hold the transformed vertices
   static std::vector<Vector2D>  m_vecVehicleVBTrans;
 
-  //render neighboring vehicles in different colors if requested
-  if (m_pWorld->RenderNeighbors())
-  {
-    if (ID() == 0) gdi->RedPen();
-    else if(IsTagged()) gdi->GreenPen();
-    else gdi->BluePen();
-  }
+  //render vehicles in different colors
 
+  // If the HumanLeader flag is on, we colored on green the Vehicle with the third ID.
+  // We know that because the ID is related to the order of the creation of Vehicle.
+  // In GameWorld.cpp, you can see that the HumanLeader is always created just after the 
+  // 2 Leaders.
+  if (m_pWorld->RenderHumanLeader())
+  {
+	  if (ID() == 2) gdi->GreenPen();
+	  else gdi->BluePen();
+  }
+  // If the TwoLeader flag is on, we colored on red the 2 first ID thanks to the explanation given above.
+  else if (m_pWorld->RenderTwoLeader()) 
+  {
+	  if (ID() == 0 || ID() == 1) gdi->RedPen();
+	  else gdi->BluePen();
+  }
+  // We only have one leader so only the first ID is colored in red.
   else
   {
-    gdi->BluePen();
+	  if (ID() == 0) gdi->RedPen();
+	  else gdi->BluePen();
   }
+
 
   if (Steering()->isInterposeOn())
   {
