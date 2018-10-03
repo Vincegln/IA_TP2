@@ -1,0 +1,8 @@
+﻿  GameWorld.cpp
+d:\repo's\ia for games\ia_tp2\misc\cellspacepartition.h(228): warning C4018: '>' : incompatibilité signed/unsigned
+  d:\repo's\ia for games\ia_tp2\misc\cellspacepartition.h(222): note: pendant la compilation de la fonction membre '<Inconnu>' (classe <Inconnu>)
+  d:\repo's\ia for games\ia_tp2\misc\cellspacepartition.h(243): note: voir la référence à l'instanciation de la fonction modèle 'int CellSpacePartition<Vehicle *>::PositionToIndex(const Vector2D &) const' en cours de compilation
+  d:\repo's\ia for games\ia_tp2\misc\cellspacepartition.h(124): note: pendant la compilation de la fonction membre '<Inconnu>' (classe <Inconnu>)
+  d:\repo's\ia for games\ia_tp2\gameworld.cpp(71): note: voir la référence à l'instanciation de la fonction modèle 'CellSpacePartition<Vehicle *>::CellSpacePartition(double,double,int,int,int)' en cours de compilation
+  d:\repo's\ia for games\ia_tp2\gameworld.cpp(71): note: voir la référence à l'instanciation de classe modèle 'CellSpacePartition<Vehicle *>' en cours de compilation
+  Steering.vcxproj -> D:\Repo's\IA for Games\IA_TP2\.\Debug\Steering.exe
